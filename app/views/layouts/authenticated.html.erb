@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+  <head>
+    <%= render "layouts/head" %>
+  </head>
+  <body class="bg-surface text-on-surface font-body-md text-body-md min-h-screen flex flex-col lg:flex-row">
+    <nav class="hidden lg:flex flex-col w-64 min-h-screen fixed left-0 top-0 bg-surface border-r border-outline-variant shadow-md z-40">
+      <div class="p-6 border-b border-outline-variant flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">analytics</span>
+        <span class="font-headline-lg text-headline-lg font-black text-primary tracking-tight">MinRisk</span>
+      </div>
+      <div class="p-4 text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider mb-2">Project Menu</div>
+      <ul class="flex-1 px-4 flex flex-col gap-1 font-body-md text-body-md">
+        <li>
+          <%= link_to companies_path, class: nav_link_class(dashboard_nav?) do %>
+            <span class="material-symbols-outlined">dashboard</span>
+            Dashboard
+          <% end %>
+        </li>
+        <li>
+          <%= link_to scope_inputs_nav_url, class: nav_link_class(scope_nav?) do %>
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dataset</span>
+            Scope &amp; Inputs
+          <% end %>
+        </li>
+        <li>
+          <%= link_to "#", class: nav_link_class(false) do %>
+            <span class="material-symbols-outlined">query_stats</span>
+            Analysis
+          <% end %>
+        </li>
+        <li>
+          <%= link_to "#", class: nav_link_class(false) do %>
+            <span class="material-symbols-outlined">monitoring</span>
+            Results
+          <% end %>
+        </li>
+        <li>
+          <%= link_to "#", class: nav_link_class(false) do %>
+            <span class="material-symbols-outlined">description</span>
+            Reports
+          <% end %>
+        </li>
+        <li class="mt-auto mb-4">
+          <%= link_to "Sign out", session_path, data: { turbo_method: :delete }, class: "flex items-center gap-4 px-4 py-2 text-on-surface-variant hover:bg-surface-container-highest rounded-full transition-colors font-body-md" %>
+        </li>
+      </ul>
+    </nav>
+
+    <header class="lg:hidden border-b border-outline-variant bg-surface flex justify-between items-center px-4 h-16 w-full z-40">
+      <div class="flex items-center gap-2 text-primary">
+        <span class="material-symbols-outlined text-primary">analytics</span>
+        <span class="font-headline-lg text-headline-lg font-black text-primary tracking-tight">MinRisk</span>
+      </div>
+      <div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline flex items-center justify-center text-on-surface-variant">
+        <span class="material-symbols-outlined text-sm">person</span>
+      </div>
+    </header>
+
+    <main class="flex-1 flex flex-col lg:ml-64 w-full min-h-0 pb-20 lg:pb-0">
+      <% flash.each do |type, msg| %>
+        <div class="px-6 py-2 text-sm <%= type.to_s == "alert" ? "bg-error-container text-error" : "bg-tertiary-fixed text-on-primary-fixed" %>"><%= msg %></div>
+      <% end %>
+      <%= yield %>
+    </main>
+
+    <nav class="lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 bg-surface px-2 border-t border-outline-variant">
+      <%= link_to companies_path, class: mobile_nav_class(dashboard_nav?) do %>
+        <span class="material-symbols-outlined">home</span>
+        <span class="font-label-caps text-label-caps mt-1">Home</span>
+      <% end %>
+      <%= link_to scope_inputs_nav_url, class: mobile_nav_class(scope_nav?) do %>
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">tune</span>
+        <span class="font-label-caps text-label-caps mt-1">Inputs</span>
+      <% end %>
+      <%= link_to "#", class: mobile_nav_class(false) do %>
+        <span class="material-symbols-outlined">play_circle</span>
+        <span class="font-label-caps text-label-caps mt-1">Run</span>
+      <% end %>
+      <%= link_to "#", class: mobile_nav_class(false) do %>
+        <span class="material-symbols-outlined">bar_chart</span>
+        <span class="font-label-caps text-label-caps mt-1">Results</span>
+      <% end %>
+      <%= link_to session_path, data: { turbo_method: :delete }, class: mobile_nav_class(false) do %>
+        <span class="material-symbols-outlined">logout</span>
+        <span class="font-label-caps text-label-caps mt-1">Out</span>
+      <% end %>
+    </nav>
+  </body>
+</html>

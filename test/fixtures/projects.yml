@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  company: one
+  name: MyString
+  code: MyString
+  description: MyText
+  currency_iso: MyString
+  time_zone: MyString
+  start_date: 2026-05-14
+  target_end_date: 2026-05-14
+  monte_carlo_iterations: 1
+  confidence_levels: 
+  estimate_accuracy_class: MyString
+  base_year: 1
+
+two:
+  company: two
+  name: MyString
+  code: MyString
+  description: MyText
+  currency_iso: MyString
+  time_zone: MyString
+  start_date: 2026-05-14
+  target_end_date: 2026-05-14
+  monte_carlo_iterations: 1
+  confidence_levels: 
+  estimate_accuracy_class: MyString
+  base_year: 1

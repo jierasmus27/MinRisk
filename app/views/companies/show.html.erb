@@ -1,0 +1,9 @@
+<div class="max-w-3xl mx-auto p-6">
+  <h1 class="font-headline-md text-headline-md text-primary mb-4"><%= @company.name %></h1>
+  <p class="font-body-md text-on-surface-variant mb-4"><%= @company.city %>, <%= @company.country_iso %></p>
+  <div class="flex gap-4">
+    <%= link_to "Projects", company_projects_path(@company), class: "text-primary font-semibold underline" %>
+    <%= link_to "Edit", edit_company_path(@company), class: "text-primary font-semibold underline" %>
+    <%= button_to "Delete", @company, method: :delete, form: { data: { turbo_confirm: "Delete this company?" } }, class: "text-error font-semibold" %>
+  </div>
+</div>

@@ -1,0 +1,57 @@
+<% content_for :title, "MinRisk - Login" %>
+<main class="w-full max-w-md px-4 relative z-10">
+  <div class="bg-surface-container-lowest border border-surface-variant rounded-xl shadow-[0px_4px_12px_rgba(0,33,71,0.05)] overflow-hidden">
+    <div class="border-b border-surface-variant p-6 flex flex-col items-center justify-center bg-surface">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="material-symbols-outlined text-primary text-[32px]" style="font-variation-settings: 'FILL' 1;">analytics</span>
+        <h1 class="font-headline-lg text-headline-lg text-primary font-black tracking-tight">MinRisk</h1>
+      </div>
+      <p class="font-body-md text-body-md text-on-surface-variant text-center">Authentication Required</p>
+    </div>
+
+    <div class="p-6">
+      <% if flash[:alert] %>
+        <p class="mb-4 text-sm text-error font-body-md" role="alert"><%= flash[:alert] %></p>
+      <% end %>
+
+      <%= form_with url: session_path, method: :post, class: "flex flex-col gap-4" do %>
+        <div class="flex flex-col gap-1">
+          <label class="font-label-caps text-label-caps text-on-surface uppercase" for="identification">Identification</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">badge</span>
+            <%= text_field_tag :operator_id, nil, id: "identification", autocomplete: "username", placeholder: "Enter Operator ID", class: "w-full pl-9 pr-2 py-2 border border-outline-variant rounded bg-surface-container-lowest text-on-surface font-tabular-numeric text-tabular-numeric focus:border-[#0056B3] focus:ring-2 focus:ring-[#0056B3]/20 outline-none transition-all placeholder:text-outline" %>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="font-label-caps text-label-caps text-on-surface uppercase" for="auth-key">Authentication Key</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">key</span>
+            <%= password_field_tag :password, nil, id: "auth-key", autocomplete: "current-password", placeholder: "••••••••••••", class: "w-full pl-9 pr-2 py-2 border border-outline-variant rounded bg-surface-container-lowest text-on-surface font-code-data text-code-data focus:border-[#0056B3] focus:ring-2 focus:ring-[#0056B3]/20 outline-none transition-all placeholder:text-outline" %>
+          </div>
+        </div>
+
+        <button class="mt-2 w-full bg-primary text-on-primary py-2.5 px-6 rounded font-body-md text-body-md font-semibold hover:bg-tertiary transition-colors flex items-center justify-center gap-2" type="submit">
+          Initialize Session
+          <span class="material-symbols-outlined text-[20px]">login</span>
+        </button>
+      <% end %>
+    </div>
+
+    <div class="bg-surface-container-low border-t border-surface-variant p-4 flex justify-between items-center">
+      <div class="flex items-center gap-1">
+        <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+        <span class="font-code-data text-code-data text-on-surface-variant">System Online</span>
+      </div>
+      <div class="flex items-center gap-1 text-on-surface-variant">
+        <span class="material-symbols-outlined text-[16px]">lock</span>
+        <span class="font-code-data text-code-data">TLS Secured</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6 text-center flex flex-col items-center gap-1">
+    <span class="font-code-data text-code-data text-outline"><%= Rails.application.config.x.app_build_label %></span>
+    <span class="font-code-data text-code-data text-outline">Enterprise Quantitative Risk Platform</span>
+  </div>
+</main>

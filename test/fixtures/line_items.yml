@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  project: one
+  spreadsheet_import: one
+  quantity: 9.99
+  total_cost_forecast_cents: 1
+  rate_cents: 1
+  cost_min_cents: 1
+  cost_max_cents: 1
+  cost_distribution: MyString
+
+two:
+  project: two
+  spreadsheet_import: two
+  quantity: 9.99
+  total_cost_forecast_cents: 1
+  rate_cents: 1
+  cost_min_cents: 1
+  cost_max_cents: 1
+  cost_distribution: MyString

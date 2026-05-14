@@ -1,0 +1,20 @@
+<div class="max-w-3xl mx-auto p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="font-headline-md text-headline-md text-primary">Projects · <%= @company.name %></h1>
+    <%= link_to "New project", new_company_project_path(@company), class: "text-primary font-semibold underline" %>
+  </div>
+  <ul class="divide-y divide-outline-variant border border-outline-variant rounded-lg bg-surface-container-lowest">
+    <% @projects.each do |project| %>
+      <li class="p-4 flex justify-between items-center hover:bg-surface-container-low">
+        <div>
+          <%= link_to project.name, [ @company, project ], class: "font-body-lg text-on-surface font-medium" %>
+          <p class="text-sm text-on-surface-variant"><%= project.currency_iso %> · <%= project.time_zone %></p>
+        </div>
+        <%= link_to "Upload", company_project_upload_path(@company, project), class: "text-sm text-on-primary-container font-semibold" %>
+      </li>
+    <% end %>
+  </ul>
+  <% if @projects.empty? %>
+    <p class="mt-4 text-on-surface-variant font-body-md">No projects yet.</p>
+  <% end %>
+</div>

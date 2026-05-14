@@ -1,0 +1,9 @@
+<div class="max-w-3xl mx-auto p-6">
+  <h1 class="font-headline-md text-headline-md text-primary mb-2"><%= @project.name %></h1>
+  <p class="text-on-surface-variant mb-4"><%= @project.code.presence || "No code" %></p>
+  <div class="flex flex-wrap gap-4">
+    <%= link_to "Upload data", company_project_upload_path(@company, @project), class: "text-primary font-semibold underline" %>
+    <%= link_to "Edit", edit_company_project_path(@company, @project), class: "text-primary font-semibold underline" %>
+    <%= link_to "All projects", company_projects_path(@company), class: "text-on-surface-variant underline" %>
+  </div>
+</div>
