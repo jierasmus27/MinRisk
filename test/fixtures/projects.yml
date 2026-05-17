@@ -5,12 +5,12 @@ one:
   name: MyString
   code: MyString
   description: MyText
-  currency_iso: MyString
+  currency_iso: USD
   time_zone: MyString
   start_date: 2026-05-14
   target_end_date: 2026-05-14
   monte_carlo_iterations: 1
-  confidence_levels: 
+  confidence_levels: [50]
   estimate_accuracy_class: MyString
   base_year: 1
 
@@ -19,11 +19,11 @@ two:
   name: MyString
   code: MyString
   description: MyText
-  currency_iso: MyString
+  currency_iso: USD
   time_zone: MyString
   start_date: 2026-05-14
   target_end_date: 2026-05-14
   monte_carlo_iterations: 1
-  confidence_levels: 
+  confidence_levels: [50]
   estimate_accuracy_class: MyString
   base_year: 1

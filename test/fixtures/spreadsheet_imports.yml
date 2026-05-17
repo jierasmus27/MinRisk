@@ -2,8 +2,8 @@
 
 one:
   project: one
-  status: MyString
+  status: pending
 
 two:
   project: two
-  status: MyString
+  status: pending
