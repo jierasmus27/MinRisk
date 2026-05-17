@@ -13,6 +13,42 @@ class SpreadsheetImport < ApplicationRecord
   validates :status, inclusion: { in: STATUSES }
   validate :file_content_type, if: -> { file.attached? }
 
+  def parse!
+    result = SpreadsheetParser.new(self).call
+    update!(
+      status: result.preview_ready? ? "preview_ready" : "failed",
+      preview_payload: result.to_h
+    )
+    result
+  end
+
+  def preview_summary
+    preview_payload&.dig("summary")
+  end
+
+  def preview_ready?
+    status == "preview_ready"
+  end
+
+  def commitable?
+    preview_ready? && preview_summary.present? && preview_summary["error_count"].to_i.zero?
+  end
+
+  def committed?
+    status == "committed"
+  end
+
+  def destroy_confirmation_message
+    count = line_items.count
+    if count.positive?
+      "Remove this import and #{count} line item#{'s' unless count == 1}? This cannot be undone."
+    elsif committed?
+      "Remove this committed import? This cannot be undone."
+    else
+      "Remove this import preview? This cannot be undone."
+    end
+  end
+
   private
 
   def file_content_type
