@@ -18,7 +18,8 @@ module ApplicationHelper
   end
 
   def dashboard_nav?
-    controller_name == "companies" && %w[index show new edit].include?(action_name)
+    (controller_name == "companies" && %w[index show new edit].include?(action_name)) ||
+      (controller_name == "projects" && action_name == "index")
   end
 
   def projects_nav?

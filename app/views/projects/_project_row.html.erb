@@ -1,0 +1,25 @@
+<li class="px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:bg-surface-container-low transition-colors">
+  <div class="min-w-0">
+    <p class="font-body-lg text-body-lg font-semibold text-on-surface"><%= project.name %></p>
+    <% if project.code.present? %>
+      <p class="font-code-data text-code-data text-on-surface-variant mt-1"><%= project.code %></p>
+    <% end %>
+    <p class="<%= body_text_class %> mt-1">
+      <%= project.currency_iso %> · <%= project.time_zone %>
+    </p>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-2 shrink-0">
+    <%= link_to company_project_path(company, project), class: outline_button_class do %>
+      <span class="material-symbols-outlined text-[18px]">edit</span>
+      Edit
+    <% end %>
+    <%= button_to company_project_path(company, project),
+          method: :delete,
+          form: { data: { turbo_confirm: project_destroy_confirmation(project) } },
+          class: danger_button_class do %>
+      <span class="material-symbols-outlined text-[18px]">delete</span>
+      Delete
+    <% end %>
+  </div>
+</li>

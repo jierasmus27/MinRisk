@@ -8,12 +8,9 @@
   </div>
 
   <div class="flex flex-wrap items-center gap-2 shrink-0">
-    <% first_project = company.projects.min_by(&:id) %>
-    <% if first_project %>
-      <%= link_to company_project_path(company, first_project), class: outline_button_class do %>
-        <span class="material-symbols-outlined text-[18px]">settings</span>
-        Project settings
-      <% end %>
+    <%= link_to company_projects_path(company), class: outline_button_class do %>
+      <span class="material-symbols-outlined text-[18px]">settings</span>
+      Project settings
     <% end %>
     <%= link_to edit_company_path(company), class: outline_button_class do %>
       <span class="material-symbols-outlined text-[18px]">edit</span>

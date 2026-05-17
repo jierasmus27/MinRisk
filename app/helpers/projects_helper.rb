@@ -46,4 +46,8 @@ module ProjectsHelper
   def project_card_class
     card_class
   end
+
+  def project_destroy_confirmation(project)
+    "Delete #{project.name}? This will permanently remove all scope data and imports for this project."
+  end
 end
