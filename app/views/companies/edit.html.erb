@@ -1,4 +1,12 @@
-<div class="max-w-xl mx-auto p-6">
-  <h1 class="font-headline-md text-headline-md text-primary mb-6">Edit company</h1>
-  <%= render "form", company: @company %>
+<% content_for :title, "Edit #{@company.name} - MinRisk" %>
+
+<%= render "shared/page_header",
+      title: "Edit company",
+      subtitle: @company.name %>
+
+<div class="p-6 flex-1 max-w-7xl mx-auto w-full">
+  <section class="<%= card_class %> max-w-2xl">
+    <h2 class="<%= card_title_class %> <%= card_title_bar_class %>">Company details</h2>
+    <%= render "form", company: @company %>
+  </section>
 </div>

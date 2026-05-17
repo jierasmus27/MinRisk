@@ -1,39 +1,51 @@
 <%= form_with model: company, class: "space-y-4" do |f| %>
   <% if company.errors.any? %>
-    <ul class="text-error text-sm list-disc pl-5">
+    <ul class="font-body-md text-body-md text-error list-disc pl-5">
       <% company.errors.full_messages.each do |msg| %>
         <li><%= msg %></li>
       <% end %>
     </ul>
   <% end %>
 
-  <div>
-    <%= f.label :name, class: "block text-sm font-medium text-on-surface mb-1" %>
-    <%= f.text_field :name, class: "w-full border border-outline-variant rounded p-2" %>
-  </div>
-  <div>
-    <%= f.label :address_line1, class: "block text-sm font-medium text-on-surface mb-1" %>
-    <%= f.text_field :address_line1, class: "w-full border border-outline-variant rounded p-2" %>
-  </div>
-  <div>
-    <%= f.label :address_line2, class: "block text-sm font-medium text-on-surface mb-1" %>
-    <%= f.text_field :address_line2, class: "w-full border border-outline-variant rounded p-2" %>
-  </div>
-  <div>
-    <%= f.label :city, class: "block text-sm font-medium text-on-surface mb-1" %>
-    <%= f.text_field :city, class: "w-full border border-outline-variant rounded p-2" %>
-  </div>
-  <div>
-    <%= f.label :country_iso, "Country (ISO alpha-2)", class: "block text-sm font-medium text-on-surface mb-1" %>
-    <%= f.text_field :country_iso, maxlength: 2, class: "w-full border border-outline-variant rounded p-2 uppercase" %>
-  </div>
-  <div>
-    <%= f.label :logo, class: "block text-sm font-medium text-on-surface mb-1" %>
-    <%= f.file_field :logo, accept: "image/png,image/jpeg,image/webp", class: "w-full text-sm" %>
+  <div class="flex flex-col gap-1">
+    <%= f.label :name, class: field_label_class %>
+    <%= f.text_field :name, class: field_input_class, autocomplete: "organization" %>
   </div>
 
-  <div class="flex gap-3 pt-4">
-    <%= f.submit class: "bg-primary text-on-primary px-4 py-2 rounded font-semibold" %>
-    <%= link_to "Cancel", companies_path, class: "px-4 py-2 border border-outline-variant rounded" %>
+  <div class="flex flex-col gap-1">
+    <%= f.label :address_line1, "Address line 1", class: field_label_class %>
+    <%= f.text_field :address_line1, class: field_input_class %>
+  </div>
+
+  <div class="flex flex-col gap-1">
+    <%= f.label :address_line2, "Address line 2", class: field_label_class %>
+    <%= f.text_field :address_line2, class: field_input_class %>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="flex flex-col gap-1">
+      <%= f.label :city, class: field_label_class %>
+      <%= f.text_field :city, class: field_input_class %>
+    </div>
+    <div class="flex flex-col gap-1">
+      <%= f.label :country_iso, "Country (ISO)", class: field_label_class %>
+      <%= f.text_field :country_iso, maxlength: 2, class: "#{field_input_class} uppercase" %>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-1">
+    <%= f.label :logo, class: field_label_class %>
+    <%= f.file_field :logo, accept: "image/png,image/jpeg,image/webp", class: "w-full font-body-md text-body-md text-on-surface" %>
+    <% if company.logo.attached? %>
+      <div class="mt-2 flex items-center gap-3">
+        <%= image_tag company.logo, class: "h-12 w-12 object-contain border border-outline-variant rounded", alt: "#{company.name} logo" %>
+        <span class="<%= body_text_class %>">Current logo</span>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="flex flex-col sm:flex-row gap-3 pt-2">
+    <%= f.submit class: primary_button_class + " sm:w-auto sm:px-8" %>
+    <%= link_to "Cancel", companies_path, class: outline_button_class + " sm:w-auto justify-center" %>
   </div>
 <% end %>

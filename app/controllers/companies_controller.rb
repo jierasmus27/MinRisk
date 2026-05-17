@@ -4,10 +4,11 @@ class CompaniesController < AuthenticatedController
   before_action :set_company, only: %i[show edit update destroy]
 
   def index
-    @companies = Company.order(:name)
+    @companies = Company.includes(:projects).order(:name)
   end
 
   def show
+    redirect_to edit_company_path(@company)
   end
 
   def new
@@ -17,7 +18,7 @@ class CompaniesController < AuthenticatedController
   def create
     @company = Company.new(company_params)
     if @company.save
-      redirect_to @company, notice: "Company created."
+      redirect_to companies_path, notice: "Company created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -28,7 +29,7 @@ class CompaniesController < AuthenticatedController
 
   def update
     if @company.update(company_params)
-      redirect_to @company, notice: "Company updated."
+      redirect_to companies_path, notice: "Company updated."
     else
       render :edit, status: :unprocessable_entity
     end

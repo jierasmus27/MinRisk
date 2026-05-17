@@ -1,17 +1,27 @@
-<div class="max-w-3xl mx-auto p-6">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="font-headline-md text-headline-md text-primary">Companies</h1>
-    <%= link_to "New company", new_company_path, class: "text-primary font-semibold underline" %>
-  </div>
-  <ul class="divide-y divide-outline-variant border border-outline-variant rounded-lg bg-surface-container-lowest">
-    <% @companies.each do |company| %>
-      <li class="p-4 flex justify-between items-center hover:bg-surface-container-low">
-        <%= link_to company.name, company, class: "font-body-lg text-on-surface font-medium" %>
-        <%= link_to "Projects", company_projects_path(company), class: "text-sm text-on-primary-container font-semibold" %>
-      </li>
+<% content_for :title, "Dashboard - MinRisk" %>
+
+<%= render "shared/page_header",
+      title: "Dashboard",
+      subtitle: "Manage companies and their projects." %>
+
+<div class="p-6 flex-1 max-w-7xl mx-auto w-full">
+  <section class="<%= card_class %>">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 <%= card_title_bar_class %>">
+      <h2 class="<%= card_title_class %>">Companies</h2>
+      <%= link_to new_company_path, class: outline_button_class do %>
+        <span class="material-symbols-outlined text-[18px]">add</span>
+        New company
+      <% end %>
+    </div>
+
+    <% if @companies.any? %>
+      <ul class="divide-y divide-outline-variant -mx-6">
+        <% @companies.each do |company| %>
+          <%= render "company_row", company: company %>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="<%= body_text_class %>">No companies yet. Create one to get started.</p>
     <% end %>
-  </ul>
-  <% if @companies.empty? %>
-    <p class="mt-4 text-on-surface-variant font-body-md">No companies yet. Create one to get started.</p>
-  <% end %>
+  </section>
 </div>
