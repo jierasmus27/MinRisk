@@ -1,9 +1,19 @@
-<div class="max-w-3xl mx-auto p-6">
-  <h1 class="font-headline-md text-headline-md text-primary mb-2"><%= @project.name %></h1>
-  <p class="text-on-surface-variant mb-4"><%= @project.code.presence || "No code" %></p>
-  <div class="flex flex-wrap gap-4">
-    <%= link_to "Upload data", company_project_upload_path(@company, @project), class: "text-primary font-semibold underline" %>
-    <%= link_to "Edit", edit_company_project_path(@company, @project), class: "text-primary font-semibold underline" %>
-    <%= link_to "All projects", company_projects_path(@company), class: "text-on-surface-variant underline" %>
+<% content_for :title, "Project Settings - MinRisk" %>
+
+<%= render "shared/page_header",
+      title: "Project Settings",
+      subtitle: "Manage project details, team members, and system preferences." %>
+
+<div class="p-6 flex-1 max-w-7xl mx-auto w-full">
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+    <%= render "project_information",
+          company: @company,
+          project: @project,
+          companies: @companies,
+          new_company: @new_company,
+          company_selection: @company_selection %>
+    <div class="md:col-span-3 space-y-6">
+      <%= render "project_logo", company: @company, project: @project %>
+    </div>
   </div>
 </div>

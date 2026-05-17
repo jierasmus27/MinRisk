@@ -9,6 +9,7 @@ class ProjectsController < AuthenticatedController
   end
 
   def show
+    prepare_show_page
   end
 
   def new
@@ -30,13 +31,27 @@ class ProjectsController < AuthenticatedController
   end
 
   def edit
+    redirect_to company_project_path(@company, @project)
   end
 
   def update
+    if params[:remove_logo].present?
+      @project.logo.purge
+      redirect_to company_project_path(@company, @project), notice: "Logo removed."
+      return
+    end
+
+    unless apply_company_selection!
+      prepare_show_page
+      render :show, status: :unprocessable_entity
+      return
+    end
+
     if @project.update(project_params)
-      redirect_to [ @company, @project ], notice: "Project updated."
+      redirect_to company_project_path(@project.company, @project), notice: "Project updated."
     else
-      render :edit, status: :unprocessable_entity
+      prepare_show_page
+      render :show, status: :unprocessable_entity
     end
   end
 
@@ -62,5 +77,40 @@ class ProjectsController < AuthenticatedController
       :estimate_accuracy_class, :base_year, :logo,
       confidence_levels: []
     )
+  end
+
+  def prepare_show_page
+    @companies = Company.order(:name)
+    @new_company ||= Company.new
+    @company_selection = params[:company_selection].presence || @company.id.to_s
+  end
+
+  def apply_company_selection!
+    selection = params[:company_selection]
+    return true if selection.blank? || selection == @company.id.to_s
+
+    if selection == "new"
+      @new_company = Company.new(new_company_params)
+      unless @new_company.save
+        @company_selection = "new"
+        return false
+      end
+      @project.update!(company: @new_company)
+      @company = @new_company
+    else
+      selected = Company.find_by(id: selection)
+      unless selected
+        @company_selection = selection
+        return false
+      end
+
+      @project.update!(company: selected)
+      @company = selected
+    end
+    true
+  end
+
+  def new_company_params
+    params.fetch(:new_company, {}).permit(:name, :address_line1, :address_line2, :city, :country_iso)
   end
 end

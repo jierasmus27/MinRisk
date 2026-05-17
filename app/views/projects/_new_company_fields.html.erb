@@ -1,0 +1,35 @@
+<% company = local_assigns[:company] || Company.new %>
+
+<% if company.errors.any? %>
+  <ul class="font-body-md text-body-md text-error list-disc pl-5">
+    <% company.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<div class="flex flex-col gap-1">
+  <%= label_tag "new_company[name]", "Company name", class: field_label_class %>
+  <%= text_field_tag "new_company[name]", company.name, class: field_input_class, autocomplete: "organization" %>
+</div>
+
+<div class="flex flex-col gap-1">
+  <%= label_tag "new_company[address_line1]", "Address line 1", class: field_label_class %>
+  <%= text_field_tag "new_company[address_line1]", company.address_line1, class: field_input_class %>
+</div>
+
+<div class="flex flex-col gap-1">
+  <%= label_tag "new_company[address_line2]", "Address line 2", class: field_label_class %>
+  <%= text_field_tag "new_company[address_line2]", company.address_line2, class: field_input_class %>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  <div class="flex flex-col gap-1">
+    <%= label_tag "new_company[city]", "City", class: field_label_class %>
+    <%= text_field_tag "new_company[city]", company.city, class: field_input_class %>
+  </div>
+  <div class="flex flex-col gap-1">
+    <%= label_tag "new_company[country_iso]", "Country (ISO)", class: field_label_class %>
+    <%= text_field_tag "new_company[country_iso]", company.country_iso, maxlength: 2, class: "#{field_input_class} uppercase" %>
+  </div>
+</div>
