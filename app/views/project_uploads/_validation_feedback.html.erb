@@ -1,6 +1,6 @@
-<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm">
-  <div class="flex items-center justify-between mb-4 border-b border-outline-variant pb-2 gap-3">
-    <h2 class="font-headline-md text-headline-md text-primary">Validation Feedback</h2>
+<div class="<%= card_class %>">
+  <div class="flex items-center justify-between <%= card_title_bar_class %> gap-3">
+    <h2 class="<%= card_title_class %>">Validation Feedback</h2>
     <div class="flex items-center gap-2 shrink-0">
       <% if preview_import.nil? %>
         <span class="bg-surface-container-low border border-outline-variant text-on-surface-variant px-2 py-1 rounded font-label-caps text-label-caps flex items-center gap-1">
@@ -36,11 +36,11 @@
   </div>
 
   <% if preview_import.nil? %>
-    <p class="font-body-md text-on-surface-variant mb-4">Upload a spreadsheet to see row-level validation, zero-tolerance reconciliation, and preview totals before committing.</p>
+    <p class="<%= body_text_class %> mb-4">Upload a spreadsheet to see row-level validation, zero-tolerance reconciliation, and preview totals before committing.</p>
   <% elsif preview.present? && preview["file_errors"].present? %>
     <div class="mb-4 p-4 rounded border border-error bg-error-container/30">
-      <p class="font-body-md text-on-error-container font-semibold mb-2">Could not parse file</p>
-      <ul class="list-disc list-inside font-body-md text-on-error-container space-y-1">
+      <p class="font-body-md text-body-md text-on-error-container font-semibold mb-2">Could not parse file</p>
+      <ul class="list-disc list-inside font-body-md text-body-md text-on-error-container space-y-1">
         <% preview["file_errors"].each do |message| %>
           <li><%= message %></li>
         <% end %>
@@ -48,8 +48,8 @@
     </div>
   <% else %>
     <% summary_text = preview["summary"] %>
-    <p class="font-body-md text-on-surface-variant mb-4">
-      Preview for <span class="font-medium text-on-surface"><%= preview_import.file.filename %></span>
+    <p class="<%= body_text_class %> mb-4">
+      Preview for <span class="font-body-md text-body-md font-medium text-on-surface"><%= preview_import.file.filename %></span>
       <% if summary_text["invalid_row_count"].to_i.positive? %>
         — <%= summary_text["invalid_row_count"] %> row(s) failed validation.
       <% elsif preview_import.commitable? %>
@@ -61,13 +61,13 @@
   <% summary = preview&.dig("summary") %>
   <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
     <div class="p-4 bg-surface border border-outline-variant rounded flex flex-col">
-      <span class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Total base cost</span>
+      <span class="<%= section_label_class %> mb-1 block">Total base cost</span>
       <span class="font-tabular-numeric text-tabular-numeric text-lg font-bold text-primary">
         <%= summary ? preview_money(summary["total_base_cost_cents"], project.currency_iso) : "—" %>
       </span>
     </div>
     <div class="p-4 bg-surface border border-outline-variant rounded flex flex-col">
-      <span class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Line items</span>
+      <span class="<%= section_label_class %> mb-1 block">Line items</span>
       <span class="font-tabular-numeric text-tabular-numeric text-lg font-bold text-primary">
         <%= summary ? summary["line_item_count"] : "—" %>
       </span>
@@ -76,13 +76,13 @@
       <% end %>
     </div>
     <div class="p-4 bg-surface border border-outline-variant rounded flex flex-col">
-      <span class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Cost packages</span>
+      <span class="<%= section_label_class %> mb-1 block">Cost packages</span>
       <span class="font-tabular-numeric text-tabular-numeric text-lg font-bold text-primary">
         <%= summary ? summary["cost_package_count"] : "—" %>
       </span>
     </div>
     <div class="p-4 bg-surface border border-outline-variant rounded flex flex-col">
-      <span class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Warnings</span>
+      <span class="<%= section_label_class %> mb-1 block">Warnings</span>
       <span class="font-tabular-numeric text-tabular-numeric text-lg font-bold text-secondary-container">
         <%= summary ? summary["warning_count"] : "—" %>
       </span>
@@ -90,7 +90,7 @@
   </div>
 
   <% if preview&.dig("packages")&.any? %>
-    <h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-2">Detection details by cost package</h3>
+    <h3 class="<%= section_label_class %> mb-2">Detection details by cost package</h3>
     <div class="overflow-x-auto border border-outline-variant rounded mb-6">
       <table class="w-full text-left font-body-md text-body-md">
         <thead class="bg-surface-container-low font-label-caps text-label-caps text-on-surface-variant uppercase">
@@ -122,7 +122,7 @@
 
   <% invalid_rows = preview&.dig("rows")&.select { |r| r["errors"].present? } %>
   <% if invalid_rows&.any? %>
-    <h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-2">Rows with errors</h3>
+    <h3 class="<%= section_label_class %> mb-2">Rows with errors</h3>
     <div class="overflow-x-auto border border-outline-variant rounded">
       <table class="w-full text-left font-body-md text-body-md">
         <thead class="bg-surface-container-low font-label-caps text-label-caps text-on-surface-variant uppercase">
@@ -150,7 +150,7 @@
       </table>
     </div>
     <% if invalid_rows.size > 20 %>
-      <p class="font-body-md text-on-surface-variant mt-2">Showing first 20 of <%= invalid_rows.size %> invalid rows.</p>
+      <p class="<%= body_text_class %> mt-2">Showing first 20 of <%= invalid_rows.size %> invalid rows.</p>
     <% end %>
   <% end %>
 </div>
