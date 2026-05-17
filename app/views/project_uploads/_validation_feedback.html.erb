@@ -1,0 +1,156 @@
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm">
+  <div class="flex items-center justify-between mb-4 border-b border-outline-variant pb-2 gap-3">
+    <h2 class="font-headline-md text-headline-md text-primary">Validation Feedback</h2>
+    <div class="flex items-center gap-2 shrink-0">
+      <% if preview_import.nil? %>
+        <span class="bg-surface-container-low border border-outline-variant text-on-surface-variant px-2 py-1 rounded font-label-caps text-label-caps flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]">hourglass_empty</span>
+          Awaiting file
+        </span>
+      <% elsif preview_import.status == "failed" %>
+        <span class="bg-error-container border border-error text-on-error-container px-2 py-1 rounded font-label-caps text-label-caps flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]">error</span>
+          Parse failed
+        </span>
+      <% elsif preview_import.commitable? %>
+        <span class="bg-tertiary-fixed border border-outline-variant text-on-tertiary-fixed px-2 py-1 rounded font-label-caps text-label-caps flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]">check_circle</span>
+          Ready to commit
+        </span>
+      <% else %>
+        <span class="bg-secondary-fixed border border-outline-variant text-on-secondary-fixed px-2 py-1 rounded font-label-caps text-label-caps flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]">warning</span>
+          Needs attention
+        </span>
+      <% end %>
+      <% if preview_import.present? %>
+        <%= button_to company_project_upload_import_path(company, project, preview_import),
+              method: :delete,
+              form: { data: { turbo_confirm: preview_import.destroy_confirmation_message } },
+              class: "p-2 rounded border border-outline-variant text-on-surface-variant hover:text-on-error-container hover:bg-error-container/20 hover:border-error transition-colors",
+              title: "Remove import" do %>
+          <span class="material-symbols-outlined text-[18px]">delete</span>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <% if preview_import.nil? %>
+    <p class="font-body-md text-on-surface-variant mb-4">Upload a spreadsheet to see row-level validation, zero-tolerance reconciliation, and preview totals before committing.</p>
+  <% elsif preview.present? && preview["file_errors"].present? %>
+    <div class="mb-4 p-4 rounded border border-error bg-error-container/30">
+      <p class="font-body-md text-on-error-container font-semibold mb-2">Could not parse file</p>
+      <ul class="list-disc list-inside font-body-md text-on-error-container space-y-1">
+        <% preview["file_errors"].each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% else %>
+    <% summary_text = preview["summary"] %>
+    <p class="font-body-md text-on-surface-variant mb-4">
+      Preview for <span class="font-medium text-on-surface"><%= preview_import.file.filename %></span>
+      <% if summary_text["invalid_row_count"].to_i.positive? %>
+        — <%= summary_text["invalid_row_count"] %> row(s) failed validation.
+      <% elsif preview_import.commitable? %>
+        — all <%= summary_text["valid_row_count"] %> rows passed validation.
+      <% end %>
+    </p>
+  <% end %>
+
+  <% summary = preview&.dig("summary") %>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div class="p-4 bg-surface border border-outline-variant rounded flex flex-col">
+      <span class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Total base cost</span>
+      <span class="font-tabular-numeric text-tabular-numeric text-lg font-bold text-primary">
+        <%= summary ? preview_money(summary["total_base_cost_cents"], project.currency_iso) : "—" %>
+      </span>
+    </div>
+    <div class="p-4 bg-surface border border-outline-variant rounded flex flex-col">
+      <span class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Line items</span>
+      <span class="font-tabular-numeric text-tabular-numeric text-lg font-bold text-primary">
+        <%= summary ? summary["line_item_count"] : "—" %>
+      </span>
+      <% if summary && summary["invalid_row_count"].to_i.positive? %>
+        <span class="font-code-data text-code-data text-on-surface-variant mt-1"><%= summary["valid_row_count"] %> valid · <%= summary["invalid_row_count"] %> invalid</span>
+      <% end %>
+    </div>
+    <div class="p-4 bg-surface border border-outline-variant rounded flex flex-col">
+      <span class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Cost packages</span>
+      <span class="font-tabular-numeric text-tabular-numeric text-lg font-bold text-primary">
+        <%= summary ? summary["cost_package_count"] : "—" %>
+      </span>
+    </div>
+    <div class="p-4 bg-surface border border-outline-variant rounded flex flex-col">
+      <span class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Warnings</span>
+      <span class="font-tabular-numeric text-tabular-numeric text-lg font-bold text-secondary-container">
+        <%= summary ? summary["warning_count"] : "—" %>
+      </span>
+    </div>
+  </div>
+
+  <% if preview&.dig("packages")&.any? %>
+    <h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-2">Detection details by cost package</h3>
+    <div class="overflow-x-auto border border-outline-variant rounded mb-6">
+      <table class="w-full text-left font-body-md text-body-md">
+        <thead class="bg-surface-container-low font-label-caps text-label-caps text-on-surface-variant uppercase">
+          <tr>
+            <th class="px-4 py-2">Package</th>
+            <th class="px-4 py-2 text-right">Lines</th>
+            <th class="px-4 py-2 text-right">Forecast total</th>
+            <th class="px-4 py-2">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% preview["packages"].each do |pkg| %>
+            <tr class="border-t border-outline-variant">
+              <td class="px-4 py-2 text-on-surface"><%= pkg["name"] %></td>
+              <td class="px-4 py-2 text-right font-tabular-numeric text-tabular-numeric"><%= pkg["line_count"] %></td>
+              <td class="px-4 py-2 text-right font-tabular-numeric text-tabular-numeric"><%= preview_money(pkg["total_forecast_cents"], project.currency_iso) %></td>
+              <td class="px-4 py-2">
+                <span class="inline-flex items-center gap-1 text-on-surface-variant">
+                  <span class="material-symbols-outlined text-[18px] text-primary-container">check_circle</span>
+                  <%= pkg["status"].humanize %>
+                </span>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+
+  <% invalid_rows = preview&.dig("rows")&.select { |r| r["errors"].present? } %>
+  <% if invalid_rows&.any? %>
+    <h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-2">Rows with errors</h3>
+    <div class="overflow-x-auto border border-outline-variant rounded">
+      <table class="w-full text-left font-body-md text-body-md">
+        <thead class="bg-surface-container-low font-label-caps text-label-caps text-on-surface-variant uppercase">
+          <tr>
+            <th class="px-4 py-2">Row</th>
+            <th class="px-4 py-2">Description</th>
+            <th class="px-4 py-2">Issues</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% invalid_rows.first(20).each do |row| %>
+            <tr class="border-t border-outline-variant bg-error-container/10">
+              <td class="px-4 py-2 font-tabular-numeric text-tabular-numeric"><%= row["row_number"] %></td>
+              <td class="px-4 py-2 text-on-surface"><%= row["description"].presence || "—" %></td>
+              <td class="px-4 py-2 text-on-error-container">
+                <ul class="list-disc list-inside space-y-0.5">
+                  <% row["errors"].each do |err| %>
+                    <li><%= err %></li>
+                  <% end %>
+                </ul>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <% if invalid_rows.size > 20 %>
+      <p class="font-body-md text-on-surface-variant mt-2">Showing first 20 of <%= invalid_rows.size %> invalid rows.</p>
+    <% end %>
+  <% end %>
+</div>

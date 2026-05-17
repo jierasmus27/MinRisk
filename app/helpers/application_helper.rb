@@ -21,8 +21,18 @@ module ApplicationHelper
     controller_name == "companies" && %w[index show new edit].include?(action_name)
   end
 
+  def scope_nav?
+    controller_name == "project_uploads" || (controller_name == "projects" && action_name == "new")
+  end
+
   def scope_inputs_nav_url
     proj = Project.includes(:company).order(:id).first
     proj ? company_project_upload_path(proj.company, proj) : companies_path
+  end
+
+  def preview_money(cents, currency_iso)
+    return "—" if cents.nil?
+
+    Money.new(cents, currency_iso).format
   end
 end
