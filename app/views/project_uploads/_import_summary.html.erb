@@ -1,0 +1,29 @@
+<% summary = project.import_summary %>
+<div>
+  <h3 class="<%= section_label_class %> mb-2">Import Summary</h3>
+  <p class="<%= body_text_class %> mb-3">Totals from data committed to this project so far.</p>
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+    <div class="p-4 bg-surface border border-outline-variant rounded flex flex-col">
+      <span class="<%= section_label_class %> mb-1 block">Total base cost</span>
+      <span class="font-tabular-numeric text-tabular-numeric text-lg font-bold text-primary">
+        <% if summary[:line_item_count].positive? %>
+          <%= preview_money(summary[:total_base_cost_cents], project.currency_iso) %>
+        <% else %>
+          —
+        <% end %>
+      </span>
+    </div>
+    <div class="p-4 bg-surface border border-outline-variant rounded flex flex-col">
+      <span class="<%= section_label_class %> mb-1 block">Line items</span>
+      <span class="font-tabular-numeric text-tabular-numeric text-lg font-bold text-primary">
+        <%= summary[:line_item_count].positive? ? summary[:line_item_count] : "—" %>
+      </span>
+    </div>
+    <div class="p-4 bg-surface border border-outline-variant rounded flex flex-col">
+      <span class="<%= section_label_class %> mb-1 block">Cost packages</span>
+      <span class="font-tabular-numeric text-tabular-numeric text-lg font-bold text-primary">
+        <%= summary[:line_item_count].positive? ? summary[:cost_package_count] : "—" %>
+      </span>
+    </div>
+  </div>
+</div>

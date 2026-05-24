@@ -20,7 +20,21 @@ class Project < ApplicationRecord
 
   before_validation :normalize_currency_and_confidence_levels
 
+  def import_summary
+    {
+      total_base_cost_cents: line_items.sum(:total_cost_forecast_cents),
+      line_item_count: line_items.count,
+      cost_package_count: cost_package_count_for_line_items
+    }
+  end
+
   private
+
+  def cost_package_count_for_line_items
+    with_package = line_items.where.not(package_value_id: nil).distinct.count(:package_value_id)
+    without_package = line_items.where(package_value_id: nil).exists? ? 1 : 0
+    with_package + without_package
+  end
 
   def normalize_currency_and_confidence_levels
     self.currency_iso = currency_iso&.upcase&.strip
