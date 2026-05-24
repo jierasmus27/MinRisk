@@ -38,7 +38,7 @@ class ProjectUploadsController < AuthenticatedController
   private
 
   def load_preview_import
-    scope = @project.spreadsheet_imports.where(status: %w[preview_ready failed])
+    scope = @project.spreadsheet_imports.where(status: %w[preview_ready committing failed])
     if params[:import_id].present?
       scope.find_by(id: params[:import_id]) || scope.order(created_at: :desc).first
     else

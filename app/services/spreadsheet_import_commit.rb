@@ -10,14 +10,14 @@ class SpreadsheetImportCommit
   end
 
   def call
-    raise NotCommittable, "Import is not ready to commit" unless @import.commitable?
+    raise NotCommittable, "Import is not ready to commit" unless @import.ready_for_commit_job?
     raise NotCommittable, "Import has already been committed" if @import.committed?
 
     preload_category_values!
 
     ActiveRecord::Base.transaction do
       valid_rows.each { |row| create_line_item!(row) }
-      @import.update!(status: "committed")
+      @import.update!(status: "committed", commit_error: nil)
     end
 
     @import

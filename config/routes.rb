@@ -16,6 +16,7 @@ Rails.application.routes.draw do
         resources :imports, only: %i[destroy], controller: "spreadsheet_imports" do
           member do
             post :commit
+            get :commit_status
           end
         end
       end
