@@ -9,4 +9,18 @@
       linear-gradient(to bottom, #e1e3e4 1px, transparent 1px);
     background-size: 40px 40px;
   }
+
+  .import-commit-progress-bar {
+    animation: import-commit-indeterminate 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes import-commit-indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(400%);
+  }
 }

@@ -41,4 +41,33 @@ class ProjectUploadsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".font-tabular-numeric", text: "$100.00"
     assert_select ".font-tabular-numeric", text: "1"
   end
+
+  test "show does not enable commit polling without a committing import" do
+    get company_project_upload_path(@company, @project_a)
+
+    assert_response :success
+    assert_select "[data-import-commit-polling-value='false']"
+    assert_select "[data-import-commit-target='progress'].hidden"
+  end
+
+  test "show renders commit progress when import is committing" do
+    @import = @project_a.spreadsheet_imports.create!(
+      status: "committing",
+      preview_payload: {
+        "summary" => {
+          "valid_row_count" => 1,
+          "invalid_row_count" => 0,
+          "line_item_count" => 1,
+          "cost_package_count" => 1,
+          "warning_count" => 0
+        }
+      }
+    )
+
+    get company_project_upload_path(@company, @project_a, import_id: @import.id)
+
+    assert_response :success
+    assert_select "[data-controller='import-commit'][data-import-commit-polling-value='true']"
+    assert_select "[data-import-commit-target='progress']:not(.hidden)"
+  end
 end

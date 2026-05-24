@@ -6,7 +6,7 @@ class SpreadsheetImport < ApplicationRecord
   has_one_attached :file
   has_many :line_items, dependent: :destroy
 
-  STATUSES = %w[pending preview_ready committed failed].freeze
+  STATUSES = %w[pending preview_ready committing committed failed].freeze
 
   attribute :status, :string, default: "pending"
 
@@ -30,8 +30,25 @@ class SpreadsheetImport < ApplicationRecord
     status == "preview_ready"
   end
 
+  def committing?
+    status == "committing"
+  end
+
   def commitable?
     preview_ready? && preview_summary.present? && preview_summary["valid_row_count"].to_i.positive?
+  end
+
+  def ready_for_commit_job?
+    (preview_ready? || committing?) && preview_summary.present? && preview_summary["valid_row_count"].to_i.positive?
+  end
+
+  def commit_failed?
+    preview_ready? && commit_error.present?
+  end
+
+  def enqueue_commit!
+    update!(status: "committing", commit_error: nil)
+    SpreadsheetImportCommitJob.perform_later(self)
   end
 
   def fully_valid?
