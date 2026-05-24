@@ -1,0 +1,40 @@
+<% companies = local_assigns.fetch(:companies) %>
+<% project = local_assigns.fetch(:project) %>
+<% company = local_assigns.fetch(:company) %>
+<% path_for = local_assigns.fetch(:path_for) %>
+<% select_id = local_assigns.fetch(:select_id, "project-select") %>
+<% empty_message = local_assigns.fetch(:empty_message, "No projects yet. Create one to get started.") %>
+
+<% projects = companies.flat_map { |c| c.projects.sort_by(&:name) } %>
+
+<div class="<%= card_class %> flex flex-col sm:flex-row sm:items-end gap-4">
+  <div class="flex-1 min-w-0 w-full sm:max-w-md">
+    <label for="<%= select_id %>" class="<%= field_label_class %>">Project</label>
+    <% if projects.any? %>
+      <select id="<%= select_id %>"
+            class="<%= field_input_class %> w-full"
+            data-controller="project-selector"
+            data-action="change->project-selector#visit">
+        <% companies.each do |c| %>
+          <% company_projects = c.projects.sort_by(&:name) %>
+          <% next if company_projects.empty? %>
+          <optgroup label="<%= c.name %>">
+            <% company_projects.each do |p| %>
+              <option value="<%= path_for.call(c, p) %>"
+                    <%= "selected" if p == project %>>
+                <%= p.name %>
+              </option>
+            <% end %>
+          </optgroup>
+        <% end %>
+      </select>
+    <% else %>
+      <p class="<%= body_text_class %>"><%= empty_message %></p>
+    <% end %>
+  </div>
+
+  <%= link_to new_company_project_path(company), class: "#{outline_button_class} shrink-0" do %>
+    <span class="material-symbols-outlined text-[18px]">add</span>
+    New project
+  <% end %>
+</div>

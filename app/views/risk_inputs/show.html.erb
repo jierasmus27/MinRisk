@@ -1,0 +1,51 @@
+<% content_for :title, "Risk Inputs - MinRisk" %>
+
+<%= render "shared/page_header",
+      title: "Risk Input Configuration",
+      subtitle: "Select and apply accuracy driver settings to cost packages." %>
+
+<div class="p-6 flex-1 flex flex-col gap-6 max-w-7xl mx-auto w-full" data-controller="risk-inputs">
+  <%= render "shared/project_selector",
+        companies: @companies,
+        company: @company,
+        project: @project,
+        select_id: "risk-inputs-project-select",
+        empty_message: "No projects yet. Create one to configure risk inputs.",
+        path_for: ->(co, proj) { company_project_risk_inputs_path(co, proj) } %>
+
+  <section data-risk-inputs-target="cardsSection">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <% @driver_types.each do |driver_type| %>
+        <%= render "driver_card",
+              company: @company,
+              project: @project,
+              driver_type: driver_type,
+              card: @driver_cards.fetch(driver_type),
+              filters: @filters %>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="<%= card_class %>">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 <%= card_title_bar_class %>">
+      <h2 class="<%= card_title_class %>">Cost Packages / Line Items</h2>
+      <%= render "filters",
+            company: @company,
+            project: @project,
+            filters: @filters,
+            wbs_options: @wbs_options,
+            cost_type_options: @cost_type_options %>
+    </div>
+
+    <%= render "package_tree",
+          package_rows: @package_rows,
+          project: @project,
+          driver_records_by_package: @driver_records_by_package %>
+
+    <%= render "summary_footer",
+          summary: @summary,
+          project: @project,
+          packages_with_drivers_count: @packages_with_drivers_count,
+          total_package_count: @total_package_count %>
+  </section>
+</div>

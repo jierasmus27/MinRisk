@@ -30,6 +30,12 @@
           <% end %>
         </li>
         <li>
+          <%= link_to risk_inputs_nav_url, class: nav_link_class(risk_inputs_nav?) do %>
+            <span class="material-symbols-outlined">tune</span>
+            Risk Inputs
+          <% end %>
+        </li>
+        <li>
           <%= link_to "#", class: nav_link_class(false) do %>
             <span class="material-symbols-outlined">query_stats</span>
             Analysis
@@ -78,6 +84,10 @@
       <%= link_to scope_inputs_nav_url, class: mobile_nav_class(scope_nav?) do %>
         <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">tune</span>
         <span class="font-label-caps text-label-caps mt-1">Inputs</span>
+      <% end %>
+      <%= link_to risk_inputs_nav_url, class: mobile_nav_class(risk_inputs_nav?) do %>
+        <span class="material-symbols-outlined">shield</span>
+        <span class="font-label-caps text-label-caps mt-1">Risk</span>
       <% end %>
       <%= link_to "#", class: mobile_nav_class(false) do %>
         <span class="material-symbols-outlined">play_circle</span>

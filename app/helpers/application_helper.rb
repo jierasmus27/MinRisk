@@ -30,14 +30,45 @@ module ApplicationHelper
     controller_name == "project_uploads"
   end
 
+  def risk_inputs_nav?
+    controller_name == "risk_inputs"
+  end
+
   def projects_nav_url
     proj = Project.includes(:company).order(:id).first
     proj ? company_project_path(proj.company, proj) : companies_path
   end
 
   def scope_inputs_nav_url
+    project_nav_url(:upload) || fallback_project_nav_url(:upload)
+  end
+
+  def risk_inputs_nav_url
+    project_nav_url(:risk_inputs) || fallback_project_nav_url(:risk_inputs)
+  end
+
+  def project_nav_url(page)
+    return unless params[:company_id].present? && params[:project_id].present?
+
+    company = Company.find_by(id: params[:company_id])
+    project = company&.projects&.find_by(id: params[:project_id])
+    return unless company && project
+
+    case page
+    when :upload then company_project_upload_path(company, project)
+    when :risk_inputs then company_project_risk_inputs_path(company, project)
+    end
+  end
+
+  def fallback_project_nav_url(page)
     proj = Project.includes(:company).order(:id).first
-    proj ? company_project_upload_path(proj.company, proj) : companies_path
+    return companies_path unless proj
+
+    case page
+    when :upload then company_project_upload_path(proj.company, proj)
+    when :risk_inputs then company_project_risk_inputs_path(proj.company, proj)
+    else companies_path
+    end
   end
 
   def preview_money(cents, currency_iso)

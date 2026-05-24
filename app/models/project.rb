@@ -5,6 +5,7 @@ class Project < ApplicationRecord
   belongs_to :company
   has_many :category_values, dependent: :destroy
   has_many :line_items, dependent: :destroy
+  has_many :package_risk_drivers, dependent: :destroy
   has_many :spreadsheet_imports, dependent: :destroy
   has_one_attached :logo
 
@@ -24,17 +25,17 @@ class Project < ApplicationRecord
     {
       total_base_cost_cents: line_items.sum(:total_cost_forecast_cents),
       line_item_count: line_items.count,
-      cost_package_count: cost_package_count_for_line_items
+      cost_package_count: cost_package_count
     }
   end
 
-  private
-
-  def cost_package_count_for_line_items
+  def cost_package_count
     with_package = line_items.where.not(package_value_id: nil).distinct.count(:package_value_id)
     without_package = line_items.where(package_value_id: nil).exists? ? 1 : 0
     with_package + without_package
   end
+
+  private
 
   def normalize_currency_and_confidence_levels
     self.currency_iso = currency_iso&.upcase&.strip

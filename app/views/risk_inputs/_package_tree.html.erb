@@ -1,0 +1,91 @@
+<div class="overflow-x-auto border border-outline-variant rounded">
+  <table class="w-full text-left font-body-md text-body-md">
+    <thead class="bg-surface-container-low font-label-caps text-label-caps text-on-surface-variant uppercase">
+      <tr>
+        <th class="px-4 py-2 w-24">Select</th>
+        <th class="px-4 py-2">Package</th>
+        <th class="px-4 py-2 text-right">Line Items</th>
+        <th class="px-4 py-2 text-right">Amount (Base)</th>
+        <th class="px-4 py-2">Linked Accuracy Drivers</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if package_rows.empty? %>
+        <tr class="border-t border-outline-variant">
+          <td colspan="5" class="px-4 py-4 text-on-surface-variant">No packages matched the selected filters.</td>
+        </tr>
+      <% end %>
+
+      <% package_rows.each do |pkg| %>
+        <% package_id = pkg[:package_value_id] %>
+        <% expandable = pkg[:line_items].any? %>
+        <% package_driver_data = driver_records_by_package.fetch(package_id, []).index_by(&:driver_type).transform_values do |record|
+             {
+               source_accuracy_class: record.source_accuracy_class,
+               distribution_type: record.distribution_type,
+               min_pct: record.min_pct,
+               mode_pct: record.mode_pct,
+               max_pct: record.max_pct
+             }
+           end %>
+        <tr class="border-t border-outline-variant bg-surface-container-lowest">
+          <td class="px-4 py-3">
+            <% if package_id.present? %>
+              <input
+                type="checkbox"
+                value="<%= package_id %>"
+                class="rounded border-outline-variant"
+                data-risk-inputs-target="packageCheckbox"
+                data-action="change->risk-inputs#selectionChanged"
+                data-driver-values="<%= package_driver_data.to_json %>">
+            <% else %>
+              <span class="text-on-surface-variant text-xs">N/A</span>
+            <% end %>
+          </td>
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-2">
+              <% if expandable %>
+                <button type="button"
+                        class="inline-flex items-center justify-center w-7 h-7 rounded border border-outline-variant text-on-surface-variant hover:bg-surface-container-low"
+                        data-action="click->risk-inputs#togglePackageRows"
+                        data-package-id="<%= package_id || "unassigned" %>"
+                        aria-expanded="false">
+                  <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                </button>
+              <% else %>
+                <span class="inline-block w-7"></span>
+              <% end %>
+              <span class="font-semibold text-on-surface"><%= pkg[:name] %></span>
+            </div>
+          </td>
+          <td class="px-4 py-3 text-right font-tabular-numeric text-tabular-numeric"><%= pkg[:line_item_count] %></td>
+          <td class="px-4 py-3 text-right font-tabular-numeric text-tabular-numeric"><%= preview_money(pkg[:amount_cents], project.currency_iso) %></td>
+          <td class="px-4 py-3">
+            <div class="flex flex-wrap gap-1">
+              <% if pkg[:linked_drivers].empty? %>
+                <span class="px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant text-[10px] uppercase">None</span>
+              <% else %>
+                <% pkg[:linked_drivers].each do |driver| %>
+                  <span class="px-2 py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed text-[10px] uppercase"><%= driver %></span>
+                <% end %>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+        <% pkg[:line_items].each do |line_item| %>
+          <tr class="border-t border-outline-variant bg-surface hidden"
+              data-risk-inputs-target="packageLineRow"
+              data-parent-package-id="<%= package_id || "unassigned" %>">
+            <td class="px-4 py-2"></td>
+            <td class="px-4 py-2 text-on-surface-variant">
+              WBS: <%= line_item[:wbs_name] %> · Cost Type: <%= line_item[:cost_type_name] %>
+            </td>
+            <td class="px-4 py-2 text-right text-on-surface-variant">Line #<%= line_item[:id] %></td>
+            <td class="px-4 py-2 text-right font-tabular-numeric text-tabular-numeric"><%= preview_money(line_item[:amount_cents], project.currency_iso) %></td>
+            <td class="px-4 py-2"></td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>

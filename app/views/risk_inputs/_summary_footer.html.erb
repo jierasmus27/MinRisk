@@ -1,0 +1,30 @@
+<div class="bg-surface-container-low px-4 py-4 mt-4 rounded border border-outline-variant flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+  <div class="flex gap-8">
+    <div>
+      <span class="<%= section_label_class %> block mb-1">Total Base Cost</span>
+      <div class="font-tabular-numeric text-tabular-numeric text-lg font-bold text-primary">
+        <%= preview_money(summary[:total_base_cost_cents], project.currency_iso) %>
+      </div>
+    </div>
+    <div>
+      <span class="<%= section_label_class %> block mb-1">Included Drivers</span>
+      <div class="font-tabular-numeric text-tabular-numeric text-lg font-bold text-primary">
+        <%= packages_with_drivers_count %> of <%= total_package_count %>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap items-end gap-6">
+    <div class="text-right">
+      <span class="<%= section_label_class %> block mb-1">Analysis Method</span>
+      <span class="font-semibold text-on-surface">Monte Carlo Simulation</span>
+    </div>
+    <div class="text-right">
+      <span class="<%= section_label_class %> block mb-1">Iterations</span>
+      <span class="font-semibold text-on-surface"><%= number_with_delimiter(project.monte_carlo_iterations) %></span>
+    </div>
+    <%= link_to "Edit Method",
+          company_project_path(project.company, project),
+          class: "px-4 py-2 border border-outline-variant rounded-lg font-label-caps text-label-caps text-primary hover:bg-surface" %>
+  </div>
+</div>

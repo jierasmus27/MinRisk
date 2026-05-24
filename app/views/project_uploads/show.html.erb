@@ -5,88 +5,83 @@
       subtitle: "Import cost estimation data sources and configure parameters for risk analysis." %>
 
 <div class="p-6 flex-1 flex flex-col gap-6 max-w-7xl mx-auto w-full">
-  <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-    <div class="<%= card_class %> xl:col-span-2 flex flex-col">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 <%= card_title_bar_class %>">
-        <h2 class="<%= card_title_class %>">Upload Data Source</h2>
-        <%= link_to template_company_project_upload_path(@company, @project),
-              class: "inline-flex items-center justify-center gap-2 px-4 py-2 rounded border border-outline-variant bg-surface-container-low text-on-surface font-body-md text-body-md hover:bg-surface-container transition-colors shrink-0" do %>
-          <span class="material-symbols-outlined text-[20px]">download</span>
-          Download import template
-        <% end %>
-      </div>
+  <%= render "project_selector", companies: @companies, company: @company, project: @project %>
 
-      <%= form_with url: company_project_upload_path(@company, @project),
-            method: :post,
-            multipart: true,
-            class: "flex flex-col gap-4",
-            data: {
-              controller: "file-drop-zone",
-              file_drop_zone_dragover_class: "border-primary-container bg-surface-container"
-            } do %>
-        <label for="upload-file-input"
-              data-file-drop-zone-target="zone"
-              data-action="dragover->file-drop-zone#dragover dragleave->file-drop-zone#dragleave drop->file-drop-zone#drop"
-              class="flex-1 border-2 border-dashed border-outline-variant hover:border-primary-container bg-surface rounded-lg flex flex-col items-center justify-center p-10 transition-colors cursor-pointer group min-h-[240px]">
-          <div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-4 group-hover:bg-tertiary-fixed transition-colors">
-            <span class="material-symbols-outlined text-3xl text-on-surface-variant group-hover:text-primary-container transition-colors">cloud_upload</span>
-          </div>
-          <p class="font-body-lg text-body-lg text-on-surface font-semibold mb-1">Drag and drop Excel files here</p>
-          <p class="<%= body_text_class %> mb-2 text-center">or click to browse from your computer (.xlsx, .csv)</p>
-          <p data-file-drop-zone-target="status" class="hidden <%= body_text_class %> mb-4 text-center"></p>
-          <%= file_field_tag :file,
-                accept: ".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                class: "sr-only",
-                id: "upload-file-input",
-                data: {
-                  file_drop_zone_target: "input",
-                  action: "change->file-drop-zone#fileSelected"
-                } %>
-          <span class="bg-primary-container text-on-primary-container px-6 py-2 rounded border border-outline-variant font-label-caps text-label-caps hover:bg-surface-tint transition-colors uppercase pointer-events-none">Browse Files</span>
-        </label>
+  <div class="<%= card_class %> flex flex-col">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 <%= card_title_bar_class %>">
+      <h2 class="<%= card_title_class %>">Upload Data Source</h2>
+      <%= link_to template_company_project_upload_path(@company, @project),
+            class: "inline-flex items-center justify-center gap-2 px-4 py-2 rounded border border-outline-variant bg-surface-container-low text-on-surface font-body-md text-body-md hover:bg-surface-container transition-colors shrink-0" do %>
+        <span class="material-symbols-outlined text-[20px]">download</span>
+        Download import template
       <% end %>
-
-      <% if @imports.any? %>
-        <div class="mt-4">
-          <h3 class="<%= section_label_class %> mb-2">Recent imports</h3>
-          <ul class="space-y-2">
-            <% @imports.each do |imp| %>
-              <li class="flex items-center justify-between gap-2 p-2 border border-outline-variant rounded bg-surface">
-                <%= link_to company_project_upload_path(@company, @project, import_id: imp.id),
-                      class: "flex items-center gap-4 min-w-0 flex-1 hover:opacity-80" do %>
-                  <span class="material-symbols-outlined text-primary-container shrink-0">description</span>
-                  <div class="min-w-0">
-                    <p class="font-body-md text-body-md text-on-surface font-medium truncate"><%= imp.file.filename %></p>
-                    <p class="font-code-data text-code-data text-on-surface-variant">
-                      <%= imp.status %>
-                      <% if imp.line_items.any? %>
-                        · <%= imp.line_items.count %> line<%= "s" unless imp.line_items.one? %>
-                      <% end %>
-                      · <%= l imp.created_at, format: :short %>
-                    </p>
-                  </div>
-                <% end %>
-                <%= button_to company_project_upload_import_path(@company, @project, imp),
-                      method: :delete,
-                      form: { data: { turbo_confirm: imp.destroy_confirmation_message } },
-                      class: "shrink-0 p-2 rounded text-on-surface-variant hover:text-on-error-container hover:bg-error-container/20 transition-colors",
-                      title: "Remove import" do %>
-                  <span class="material-symbols-outlined text-[20px]">delete</span>
-                <% end %>
-              </li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
-
-      <div class="mt-4">
-        <%= render "import_summary", project: @project %>
-      </div>
     </div>
 
-    <div class="<%= card_class %> flex flex-col">
-      <h2 class="<%= card_title_class %> <%= card_title_bar_class %>">Project</h2>
-      <%= render "project_selector", companies: @companies, company: @company, project: @project %>
+    <%= form_with url: company_project_upload_path(@company, @project),
+          method: :post,
+          multipart: true,
+          class: "flex flex-col gap-4",
+          data: {
+            controller: "file-drop-zone",
+            file_drop_zone_dragover_class: "border-primary-container bg-surface-container"
+          } do %>
+      <label for="upload-file-input"
+            data-file-drop-zone-target="zone"
+            data-action="dragover->file-drop-zone#dragover dragleave->file-drop-zone#dragleave drop->file-drop-zone#drop"
+            class="flex-1 border-2 border-dashed border-outline-variant hover:border-primary-container bg-surface rounded-lg flex flex-col items-center justify-center p-10 transition-colors cursor-pointer group min-h-[240px]">
+        <div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-4 group-hover:bg-tertiary-fixed transition-colors">
+          <span class="material-symbols-outlined text-3xl text-on-surface-variant group-hover:text-primary-container transition-colors">cloud_upload</span>
+        </div>
+        <p class="font-body-lg text-body-lg text-on-surface font-semibold mb-1">Drag and drop Excel files here</p>
+        <p class="<%= body_text_class %> mb-2 text-center">or click to browse from your computer (.xlsx, .csv)</p>
+        <p data-file-drop-zone-target="status" class="hidden <%= body_text_class %> mb-4 text-center"></p>
+        <%= file_field_tag :file,
+              accept: ".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              class: "sr-only",
+              id: "upload-file-input",
+              data: {
+                file_drop_zone_target: "input",
+                action: "change->file-drop-zone#fileSelected"
+              } %>
+        <span class="bg-primary-container text-on-primary-container px-6 py-2 rounded border border-outline-variant font-label-caps text-label-caps hover:bg-surface-tint transition-colors uppercase pointer-events-none">Browse Files</span>
+      </label>
+    <% end %>
+
+    <% if @imports.any? %>
+      <div class="mt-4">
+        <h3 class="<%= section_label_class %> mb-2">Recent imports</h3>
+        <ul class="space-y-2">
+          <% @imports.each do |imp| %>
+            <li class="flex items-center justify-between gap-2 p-2 border border-outline-variant rounded bg-surface">
+              <%= link_to company_project_upload_path(@company, @project, import_id: imp.id),
+                    class: "flex items-center gap-4 min-w-0 flex-1 hover:opacity-80" do %>
+                <span class="material-symbols-outlined text-primary-container shrink-0">description</span>
+                <div class="min-w-0">
+                  <p class="font-body-md text-body-md text-on-surface font-medium truncate"><%= imp.file.filename %></p>
+                  <p class="font-code-data text-code-data text-on-surface-variant">
+                    <%= imp.status %>
+                    <% if imp.line_items.any? %>
+                      · <%= imp.line_items.count %> line<%= "s" unless imp.line_items.one? %>
+                    <% end %>
+                    · <%= l imp.created_at, format: :short %>
+                  </p>
+                </div>
+              <% end %>
+              <%= button_to company_project_upload_import_path(@company, @project, imp),
+                    method: :delete,
+                    form: { data: { turbo_confirm: imp.destroy_confirmation_message } },
+                    class: "shrink-0 p-2 rounded text-on-surface-variant hover:text-on-error-container hover:bg-error-container/20 transition-colors",
+                    title: "Remove import" do %>
+                <span class="material-symbols-outlined text-[20px]">delete</span>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="mt-4">
+      <%= render "import_summary", project: @project %>
     </div>
   </div>
 

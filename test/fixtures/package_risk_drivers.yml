@@ -1,0 +1,9 @@
+price_one:
+  project: one
+  package_value: one
+  driver_type: price
+  source_accuracy_class: class_b_budget_quote
+  distribution_type: triangular
+  min_pct: -20
+  mode_pct: 0
+  max_pct: 30

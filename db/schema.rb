@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_24_110000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_24_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -86,6 +86,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_24_110000) do
     t.index ["wbs_value_id"], name: "index_line_items_on_wbs_value_id"
   end
 
+  create_table "package_risk_drivers", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "distribution_type", null: false
+    t.string "driver_type", null: false
+    t.decimal "max_pct", precision: 8, scale: 3, null: false
+    t.decimal "min_pct", precision: 8, scale: 3, null: false
+    t.decimal "mode_pct", precision: 8, scale: 3, null: false
+    t.bigint "package_value_id", null: false
+    t.bigint "project_id", null: false
+    t.string "source_accuracy_class", null: false
+    t.datetime "updated_at", null: false
+    t.index ["package_value_id", "driver_type"], name: "index_package_risk_drivers_on_package_value_id_and_driver_type", unique: true
+    t.index ["package_value_id"], name: "index_package_risk_drivers_on_package_value_id"
+    t.index ["project_id"], name: "index_package_risk_drivers_on_project_id"
+  end
+
   create_table "projects", force: :cascade do |t|
     t.integer "base_year"
     t.string "code"
@@ -141,6 +157,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_24_110000) do
   add_foreign_key "line_items", "category_values", column: "wbs_value_id"
   add_foreign_key "line_items", "projects"
   add_foreign_key "line_items", "spreadsheet_imports"
+  add_foreign_key "package_risk_drivers", "category_values", column: "package_value_id"
+  add_foreign_key "package_risk_drivers", "projects"
   add_foreign_key "projects", "companies"
   add_foreign_key "spreadsheet_imports", "projects"
 end

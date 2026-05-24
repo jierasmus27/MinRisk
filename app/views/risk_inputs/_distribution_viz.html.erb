@@ -1,0 +1,22 @@
+<div class="w-full bg-surface rounded border border-outline-variant px-3 py-2" data-risk-inputs-target="distributionViz" data-driver-type="<%= driver_type %>">
+  <div class="h-16 flex items-end justify-center relative">
+    <svg class="w-full h-full text-primary" viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path data-shape="triangular" d="M 20 70 L 100 10 L 180 70" stroke="currentColor" stroke-width="2" <%= "hidden" unless distribution_type == "triangular" %> />
+      <path data-shape="triangular-fill" d="M 20 70 L 100 10 L 180 70 Z" fill="currentColor" fill-opacity="0.12" <%= "hidden" unless distribution_type == "triangular" %> />
+
+      <path data-shape="lognormal" d="M 10 70 Q 45 8, 90 38 T 190 70" stroke="currentColor" stroke-width="2" <%= "hidden" unless distribution_type == "lognormal" %> />
+      <path data-shape="lognormal-fill" d="M 10 70 Q 45 8, 90 38 T 190 70 Z" fill="currentColor" fill-opacity="0.12" <%= "hidden" unless distribution_type == "lognormal" %> />
+
+      <path data-shape="normal" d="M 10 70 Q 60 5, 100 28 Q 140 5, 190 70" stroke="currentColor" stroke-width="2" <%= "hidden" unless distribution_type == "normal" %> />
+      <path data-shape="normal-fill" d="M 10 70 Q 60 5, 100 28 Q 140 5, 190 70 Z" fill="currentColor" fill-opacity="0.12" <%= "hidden" unless distribution_type == "normal" %> />
+
+      <path data-shape="uniform" d="M 30 70 L 30 30 L 170 30 L 170 70" stroke="currentColor" stroke-width="2" <%= "hidden" unless distribution_type == "uniform" %> />
+      <path data-shape="uniform-fill" d="M 30 70 L 30 30 L 170 30 L 170 70 Z" fill="currentColor" fill-opacity="0.12" <%= "hidden" unless distribution_type == "uniform" %> />
+    </svg>
+  </div>
+  <div class="mt-1 flex justify-between text-[10px] text-on-surface-variant font-semibold">
+    <span data-role="viz-min"><%= number_to_percentage(min_pct, precision: 1, strip_insignificant_zeros: true) %></span>
+    <span>Most Likely</span>
+    <span data-role="viz-max"><%= number_to_percentage(max_pct, precision: 1, strip_insignificant_zeros: true) %></span>
+  </div>
+</div>

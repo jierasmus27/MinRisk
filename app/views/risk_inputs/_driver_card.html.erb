@@ -1,0 +1,60 @@
+<% driver_title = "#{driver_type.humanize} Accuracy" %>
+<% source_options = PackageRiskDriver::SOURCE_ACCURACY_CLASSES.map { |value, label| [label, value] } %>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm space-y-3">
+  <div class="flex items-center justify-between">
+    <h3 class="font-headline-md text-headline-md text-on-surface"><%= driver_title %></h3>
+    <span class="text-xs text-on-surface-variant uppercase tracking-wide"><%= driver_type %></span>
+  </div>
+
+  <%= form_with url: company_project_risk_inputs_path(company, project), method: :patch, class: "space-y-3", data: { risk_inputs_target: "driverForm", driver_type: driver_type } do %>
+    <%= hidden_field_tag :wbs_value_id, filters[:wbs_value_id] %>
+    <%= hidden_field_tag :cost_type_value_id, filters[:cost_type_value_id] %>
+    <%= hidden_field_tag :sort, filters[:sort] %>
+    <%= hidden_field_tag :direction, filters[:direction] %>
+    <%= hidden_field_tag "risk_input[driver_type]", driver_type %>
+
+    <div class="space-y-1">
+      <label class="<%= field_label_class %>">Source Accuracy</label>
+      <%= select_tag "risk_input[source_accuracy_class]",
+            options_for_select(source_options, card[:source_accuracy_class]),
+            class: field_input_class,
+            data: { role: "source" } %>
+    </div>
+
+    <div class="space-y-1">
+      <label class="<%= field_label_class %>">Distribution Curve</label>
+      <%= select_tag "risk_input[distribution_type]",
+            options_for_select(LineItem::DISTRIBUTION_TYPES.map { |name| [name.humanize, name] }, card[:distribution_type]),
+            class: field_input_class,
+            data: { role: "distribution", action: "change->risk-inputs#updateDistribution" } %>
+    </div>
+
+    <%= render "distribution_viz", driver_type: driver_type, distribution_type: card[:distribution_type], min_pct: card[:min_pct], max_pct: card[:max_pct] %>
+
+    <div class="grid grid-cols-3 gap-2">
+      <div class="space-y-1">
+        <label class="<%= field_label_class %>">Min (%)</label>
+        <%= number_field_tag "risk_input[min_pct]", card[:min_pct], step: "0.1", class: field_input_class, data: { role: "min", action: "input->risk-inputs#updateDistribution" } %>
+      </div>
+      <div class="space-y-1">
+        <label class="<%= field_label_class %>">Most Likely (%)</label>
+        <%= number_field_tag "risk_input[mode_pct]", card[:mode_pct], step: "0.1", class: field_input_class, data: { role: "mode", action: "input->risk-inputs#updateDistribution" } %>
+      </div>
+      <div class="space-y-1">
+        <label class="<%= field_label_class %>">Max (%)</label>
+        <%= number_field_tag "risk_input[max_pct]", card[:max_pct], step: "0.1", class: field_input_class, data: { role: "max", action: "input->risk-inputs#updateDistribution" } %>
+      </div>
+    </div>
+
+    <div data-risk-inputs-target="packageIds"></div>
+
+    <button type="submit"
+            class="w-full bg-primary-container text-on-primary-container py-2 rounded font-label-caps text-label-caps hover:opacity-90 transition-opacity uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
+            data-risk-inputs-target="applyButton"
+            data-driver-type="<%= driver_type %>"
+            disabled>
+      Apply to 0 selected packages
+    </button>
+  <% end %>
+</div>

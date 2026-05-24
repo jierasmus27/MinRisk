@@ -1,0 +1,37 @@
+<%= form_with url: company_project_risk_inputs_path(company, project), method: :get, local: true, class: "flex flex-wrap items-end gap-3" do %>
+  <div>
+    <label for="wbs_value_id" class="<%= field_label_class %>">WBS</label>
+    <select id="wbs_value_id" name="wbs_value_id" class="<%= field_input_class %> min-w-40" data-action="change->risk-inputs#submitFilters">
+      <option value="">All</option>
+      <% wbs_options.each do |option| %>
+        <option value="<%= option.id %>" <%= "selected" if filters[:wbs_value_id].to_s == option.id.to_s %>><%= option.name %></option>
+      <% end %>
+    </select>
+  </div>
+
+  <div>
+    <label for="cost_type_value_id" class="<%= field_label_class %>">Cost Type</label>
+    <select id="cost_type_value_id" name="cost_type_value_id" class="<%= field_input_class %> min-w-40" data-action="change->risk-inputs#submitFilters">
+      <option value="">All</option>
+      <% cost_type_options.each do |option| %>
+        <option value="<%= option.id %>" <%= "selected" if filters[:cost_type_value_id].to_s == option.id.to_s %>><%= option.name %></option>
+      <% end %>
+    </select>
+  </div>
+
+  <div>
+    <label for="sort" class="<%= field_label_class %>">Sort</label>
+    <select id="sort" name="sort" class="<%= field_input_class %> min-w-32" data-action="change->risk-inputs#submitFilters">
+      <option value="name" <%= "selected" if filters[:sort] == "name" %>>Name</option>
+      <option value="amount" <%= "selected" if filters[:sort] == "amount" %>>Amount</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="direction" class="<%= field_label_class %>">Direction</label>
+    <select id="direction" name="direction" class="<%= field_input_class %> min-w-28" data-action="change->risk-inputs#submitFilters">
+      <option value="asc" <%= "selected" if filters[:direction] == "asc" %>>Ascending</option>
+      <option value="desc" <%= "selected" if filters[:direction] == "desc" %>>Descending</option>
+    </select>
+  </div>
+<% end %>

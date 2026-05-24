@@ -11,6 +11,7 @@ Rails.application.routes.draw do
 
   resources :companies do
     resources :projects do
+      resource :risk_inputs, only: %i[show update], controller: "risk_inputs"
       resource :upload, only: %i[show create], controller: "project_uploads" do
         get :template
         resources :imports, only: %i[destroy], controller: "spreadsheet_imports" do
