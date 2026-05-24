@@ -1,0 +1,133 @@
+<% company_selection = local_assigns.fetch(:company_selection, company.id.to_s) %>
+<% companies = local_assigns.fetch(:companies, [ company ]) %>
+<% new_company = local_assigns.fetch(:new_company, Company.new) %>
+<% submit_label = local_assigns.fetch(:submit_label, "Save changes") %>
+
+<section class="md:col-span-5 <%= card_class %>">
+  <div class="flex items-center justify-between <%= card_title_bar_class %>">
+    <h2 class="<%= card_title_class %>">Project Information</h2>
+    <span class="material-symbols-outlined text-outline text-[20px]">info</span>
+  </div>
+
+  <%= form_with model: [ company, project ], class: "space-y-4", data: { controller: "company-selector" } do |f| %>
+    <% if project.errors.any? %>
+      <ul class="font-body-md text-body-md text-error list-disc pl-5">
+        <% project.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <div class="space-y-4">
+      <div class="flex flex-col gap-1">
+        <label for="company_selection" class="<%= field_label_class %>">Company</label>
+        <select id="company_selection"
+              name="company_selection"
+              class="<%= field_input_class %>"
+              data-company-selector-target="select"
+              data-action="company-selector#toggle">
+          <% companies.each do |c| %>
+            <option value="<%= c.id %>" <%= "selected" if company_selection.to_s == c.id.to_s %>><%= c.name %></option>
+          <% end %>
+          <option value="new" <%= "selected" if company_selection == "new" %>>Create new company…</option>
+        </select>
+      </div>
+
+      <div data-company-selector-target="newPanel"
+           class="space-y-4 p-4 border border-outline-variant rounded-lg bg-surface-container-low"
+           <%= "hidden" unless company_selection == "new" %>>
+        <p class="<%= section_label_class %>">New company details</p>
+        <%= render "new_company_fields", company: new_company %>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <%= f.label :name, "Project name", class: field_label_class %>
+        <%= f.text_field :name, class: field_input_class %>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <%= f.label :code, "Project code", class: field_label_class %>
+        <%= f.text_field :code, class: field_input_class %>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <%= f.label :description, class: field_label_class %>
+        <%= f.text_area :description, rows: 4, class: "#{field_input_class} resize-none" %>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-1">
+          <%= f.label :estimate_accuracy_class, "Study level", class: field_label_class %>
+          <%= f.select :estimate_accuracy_class,
+                estimate_accuracy_options,
+                { include_blank: "—" },
+                class: field_input_class %>
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="<%= field_label_class %>">Project owner</label>
+          <select class="<%= field_input_class %> opacity-60" disabled aria-disabled="true">
+            <option>Not configured</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-1">
+          <%= f.label :currency_iso, "Project currency", class: field_label_class %>
+          <%= f.select :currency_iso, currency_options, {}, class: field_input_class %>
+        </div>
+        <div class="flex flex-col gap-1">
+          <%= f.label :time_zone, class: field_label_class %>
+          <%= f.collection_select :time_zone,
+                ActiveSupport::TimeZone.all,
+                :name,
+                :to_s,
+                { selected: project.time_zone.presence || "UTC" },
+                class: field_input_class %>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-1">
+          <%= f.label :start_date, class: field_label_class %>
+          <%= f.date_field :start_date, class: field_input_class %>
+        </div>
+        <div class="flex flex-col gap-1">
+          <%= f.label :target_end_date, "Target completion", class: field_label_class %>
+          <%= f.date_field :target_end_date, class: field_input_class %>
+        </div>
+      </div>
+
+      <fieldset>
+        <legend class="<%= field_label_class %> mb-2">Confidence levels</legend>
+        <div class="flex flex-wrap gap-3">
+          <% (10..90).step(10).each do |pct| %>
+            <label class="inline-flex items-center gap-1 font-body-md text-body-md text-on-surface">
+              <%= check_box_tag "project[confidence_levels][]",
+                    pct,
+                    project.confidence_levels.include?(pct),
+                    id: "project_confidence_#{pct}" %>
+              <span>P<%= pct %></span>
+            </label>
+          <% end %>
+        </div>
+        <%= hidden_field_tag "project[confidence_levels][]", "" %>
+      </fieldset>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-1">
+          <%= f.label :monte_carlo_iterations, "Iterations", class: field_label_class %>
+          <%= f.number_field :monte_carlo_iterations, class: field_input_class %>
+        </div>
+        <div class="flex flex-col gap-1">
+          <%= f.label :base_year, "Date of prices (year)", class: field_label_class %>
+          <%= f.number_field :base_year, class: field_input_class %>
+        </div>
+      </div>
+    </div>
+
+    <div class="pt-2">
+      <%= f.submit submit_label, class: primary_button_class %>
+    </div>
+  <% end %>
+</section>

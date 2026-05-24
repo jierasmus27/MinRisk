@@ -1,0 +1,22 @@
+<section class="<%= card_class %>">
+  <h2 class="<%= card_title_class %> <%= card_title_bar_class %>">Project Address</h2>
+
+  <div class="space-y-4">
+    <div class="space-y-1">
+      <span class="<%= field_label_class %>">Company</span>
+      <p class="font-body-md text-body-md font-semibold text-on-surface"><%= company.name %></p>
+    </div>
+    <div class="space-y-1">
+      <span class="<%= field_label_class %>">Address</span>
+      <% if company.address_line1.present? || company.city.present? %>
+        <p class="<%= body_text_class %>"><%= company_address_html(company) %></p>
+      <% else %>
+        <p class="<%= body_text_class %>">—</p>
+      <% end %>
+    </div>
+    <div class="space-y-1">
+      <span class="<%= field_label_class %>">Country</span>
+      <p class="<%= body_text_class %>"><%= company.country_iso %></p>
+    </div>
+  </div>
+</section>

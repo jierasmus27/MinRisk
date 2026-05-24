@@ -1,0 +1,35 @@
+<section class="<%= card_class %>">
+  <h2 class="<%= card_title_class %> <%= card_title_bar_class %>">Key Project Settings</h2>
+
+  <div class="-mx-6 divide-y divide-outline-variant">
+    <% settings_rows = [
+      [ "Base case", "—" ],
+      [ "Estimation basis", "Probabilistic" ],
+      [ "Iterations", number_with_delimiter(project.monte_carlo_iterations) ],
+      [ "Confidence levels", nil ],
+      [ "Inflation", "Off" ],
+      [ "Discount rate", "—" ],
+      [ "Contingency", "—" ],
+      [ "Date of prices", project.base_year.present? ? project.base_year.to_s : "—" ],
+      [ "Units", "Metric" ]
+    ] %>
+
+    <% settings_rows.each do |label, value| %>
+      <div class="px-6 py-2 flex justify-between items-center hover:bg-surface-container-low transition-colors group">
+        <div class="flex flex-col min-w-0">
+          <span class="<%= section_label_class %>"><%= label %></span>
+          <% if label == "Confidence levels" %>
+            <div class="flex flex-wrap gap-1 mt-1">
+              <% confidence_level_tags(project.confidence_levels).each do |tag| %>
+                <span class="bg-surface-container px-2 py-0.5 font-label-caps text-label-caps rounded"><%= tag %></span>
+              <% end %>
+            </div>
+          <% else %>
+            <span class="font-tabular-numeric text-tabular-numeric text-on-surface"><%= value %></span>
+          <% end %>
+        </div>
+        <span class="material-symbols-outlined text-outline shrink-0 group-hover:translate-x-0.5 transition-transform">chevron_right</span>
+      </div>
+    <% end %>
+  </div>
+</section>

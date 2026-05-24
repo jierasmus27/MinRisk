@@ -13,6 +13,62 @@ class SpreadsheetImport < ApplicationRecord
   validates :status, inclusion: { in: STATUSES }
   validate :file_content_type, if: -> { file.attached? }
 
+  def parse!
+    result = SpreadsheetParser.new(self).call
+    update!(
+      status: result.preview_ready? ? "preview_ready" : "failed",
+      preview_payload: result.to_h
+    )
+    result
+  end
+
+  def preview_summary
+    preview_payload&.dig("summary")
+  end
+
+  def preview_ready?
+    status == "preview_ready"
+  end
+
+  def commitable?
+    preview_ready? && preview_summary.present? && preview_summary["valid_row_count"].to_i.positive?
+  end
+
+  def fully_valid?
+    commitable? && preview_summary["invalid_row_count"].to_i.zero?
+  end
+
+  def commit!
+    SpreadsheetImportCommit.new(self).call
+  end
+
+  def commit_confirmation_message
+    summary = preview_summary
+    valid = summary["valid_row_count"].to_i
+    invalid = summary["invalid_row_count"].to_i
+
+    if invalid.positive?
+      "Import #{valid} valid row#{'s' unless valid == 1}? #{invalid} invalid row#{'s' unless invalid == 1} will be skipped."
+    else
+      "Import #{valid} line item#{'s' unless valid == 1} into this project?"
+    end
+  end
+
+  def committed?
+    status == "committed"
+  end
+
+  def destroy_confirmation_message
+    count = line_items.count
+    if count.positive?
+      "Remove this import and #{count} line item#{'s' unless count == 1}? This cannot be undone."
+    elsif committed?
+      "Remove this committed import? This cannot be undone."
+    else
+      "Remove this import preview? This cannot be undone."
+    end
+  end
+
   private
 
   def file_content_type

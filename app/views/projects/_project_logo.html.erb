@@ -1,0 +1,40 @@
+<section class="<%= card_class %>">
+  <h2 class="<%= card_title_class %> <%= card_title_bar_class %>">Project Logo</h2>
+
+  <div class="flex flex-col items-center gap-4">
+    <% unless project.persisted? %>
+      <div class="w-full aspect-square border-2 border-dashed border-outline-variant rounded-lg flex flex-col items-center justify-center bg-surface-container-low p-4 text-center">
+        <span class="material-symbols-outlined text-4xl text-outline mb-2">filter_hdr</span>
+        <p class="<%= body_text_class %>">Upload a logo after creating the project.</p>
+      </div>
+    <% else %>
+    <%= form_with model: [ company, project ], class: "w-full flex flex-col items-center gap-4" do |f| %>
+      <label class="w-full aspect-square border-2 border-dashed border-outline-variant rounded-lg flex flex-col items-center justify-center bg-surface-container-low cursor-pointer hover:bg-surface-container-high transition-colors overflow-hidden">
+        <% if project.logo.attached? %>
+          <%= image_tag project.logo, class: "w-full h-full object-contain p-2", alt: "#{project.name} logo" %>
+        <% else %>
+          <span class="material-symbols-outlined text-4xl text-outline mb-2">filter_hdr</span>
+          <span class="<%= section_label_class %> text-center px-4">
+            <%= project.name %>
+          </span>
+        <% end %>
+        <%= f.file_field :logo,
+              accept: "image/png,image/jpeg,image/webp",
+              class: "sr-only",
+              onchange: "this.form.requestSubmit()" %>
+      </label>
+    <% end %>
+
+    <% if project.logo.attached? %>
+      <%= button_to company_project_path(company, project),
+            method: :patch,
+            params: { remove_logo: "1" },
+            form: { data: { turbo_confirm: "Remove project logo?" } },
+            class: "text-error font-label-caps text-label-caps flex items-center gap-1 hover:underline uppercase tracking-wide" do %>
+        <span class="material-symbols-outlined text-sm">delete</span>
+        Remove logo
+      <% end %>
+    <% end %>
+    <% end %>
+  </div>
+</section>

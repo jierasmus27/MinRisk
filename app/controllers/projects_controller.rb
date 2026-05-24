@@ -9,9 +9,11 @@ class ProjectsController < AuthenticatedController
   end
 
   def show
+    prepare_project_page
   end
 
   def new
+    prepare_project_page
     @project = @company.projects.new(
       currency_iso: "USD",
       time_zone: "UTC",
@@ -21,22 +23,43 @@ class ProjectsController < AuthenticatedController
   end
 
   def create
+    prepare_project_page
     @project = @company.projects.new(project_params)
+
+    unless assign_company_from_selection!
+      render :new, status: :unprocessable_entity
+      return
+    end
+
     if @project.save
-      redirect_to company_project_upload_path(@company, @project), notice: "Project created."
+      redirect_to company_project_path(@project.company, @project), notice: "Project created."
     else
       render :new, status: :unprocessable_entity
     end
   end
 
   def edit
+    redirect_to company_project_path(@company, @project)
   end
 
   def update
+    if params[:remove_logo].present?
+      @project.logo.purge
+      redirect_to company_project_path(@company, @project), notice: "Logo removed."
+      return
+    end
+
+    unless assign_company_from_selection!
+      prepare_project_page
+      render :show, status: :unprocessable_entity
+      return
+    end
+
     if @project.update(project_params)
-      redirect_to [ @company, @project ], notice: "Project updated."
+      redirect_to company_project_path(@project.company, @project), notice: "Project updated."
     else
-      render :edit, status: :unprocessable_entity
+      prepare_project_page
+      render :show, status: :unprocessable_entity
     end
   end
 
@@ -62,5 +85,43 @@ class ProjectsController < AuthenticatedController
       :estimate_accuracy_class, :base_year, :logo,
       confidence_levels: []
     )
+  end
+
+  def prepare_project_page
+    @companies = Company.order(:name)
+    @new_company ||= Company.new
+    @company_selection = params[:company_selection].presence || @company.id.to_s
+  end
+
+  def assign_company_from_selection!
+    selection = params[:company_selection]
+    return true if selection.blank? || selection == @company.id.to_s
+
+    if selection == "new"
+      @new_company = Company.new(new_company_params)
+      unless @new_company.save
+        @company_selection = "new"
+        return false
+      end
+      target_company = @new_company
+    else
+      target_company = Company.find_by(id: selection)
+      unless target_company
+        @company_selection = selection
+        return false
+      end
+    end
+
+    if @project.persisted?
+      @project.update!(company: target_company)
+    else
+      @project.company = target_company
+    end
+    @company = target_company
+    true
+  end
+
+  def new_company_params
+    params.fetch(:new_company, {}).permit(:name, :address_line1, :address_line2, :city, :country_iso)
   end
 end

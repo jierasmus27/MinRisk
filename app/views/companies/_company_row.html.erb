@@ -1,0 +1,27 @@
+<li class="px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:bg-surface-container-low transition-colors">
+  <div class="min-w-0">
+    <p class="font-body-lg text-body-lg font-semibold text-on-surface"><%= company.name %></p>
+    <p class="<%= body_text_class %> mt-1"><%= company_location_label(company) %></p>
+    <p class="font-code-data text-code-data text-on-surface-variant mt-1">
+      <%= pluralize(company.projects.size, "project") %>
+    </p>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-2 shrink-0">
+    <%= link_to company_projects_path(company), class: outline_button_class do %>
+      <span class="material-symbols-outlined text-[18px]">settings</span>
+      Project settings
+    <% end %>
+    <%= link_to edit_company_path(company), class: outline_button_class do %>
+      <span class="material-symbols-outlined text-[18px]">edit</span>
+      Edit
+    <% end %>
+    <%= button_to company_path(company),
+          method: :delete,
+          form: { data: { turbo_confirm: company_destroy_confirmation(company) } },
+          class: danger_button_class do %>
+      <span class="material-symbols-outlined text-[18px]">delete</span>
+      Delete
+    <% end %>
+  </div>
+</li>

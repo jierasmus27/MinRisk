@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_14_205722) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_24_103000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -64,17 +64,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_205722) do
 
   create_table "line_items", force: :cascade do |t|
     t.string "cost_distribution"
-    t.integer "cost_max_cents"
-    t.integer "cost_min_cents"
+    t.bigint "cost_max_cents"
+    t.bigint "cost_min_cents"
     t.bigint "cost_type_value_id"
     t.datetime "created_at", null: false
     t.bigint "discipline_value_id"
     t.bigint "package_value_id"
     t.bigint "project_id", null: false
     t.decimal "quantity", precision: 24, scale: 8, null: false
-    t.integer "rate_cents", null: false
+    t.bigint "rate_cents", null: false
     t.bigint "spreadsheet_import_id"
-    t.integer "total_cost_forecast_cents", null: false
+    t.bigint "total_cost_forecast_cents", null: false
     t.datetime "updated_at", null: false
     t.bigint "wbs_value_id"
     t.index ["cost_type_value_id"], name: "index_line_items_on_cost_type_value_id"
@@ -106,6 +106,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_205722) do
 
   create_table "spreadsheet_imports", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.jsonb "preview_payload"
     t.bigint "project_id", null: false
     t.string "status", default: "pending", null: false
     t.datetime "updated_at", null: false
