@@ -1,0 +1,37 @@
+<% companies = local_assigns.fetch(:companies) %>
+<% project = local_assigns.fetch(:project) %>
+<% company = local_assigns.fetch(:company) %>
+
+<% projects = companies.flat_map { |c| c.projects.sort_by(&:name) } %>
+
+<div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-1">
+    <% if projects.any? %>
+      <select id="scope-project-select"
+            aria-label="Project"
+            class="<%= field_input_class %>"
+            data-controller="project-selector"
+            data-action="change->project-selector#visit">
+        <% companies.each do |c| %>
+          <% company_projects = c.projects.sort_by(&:name) %>
+          <% next if company_projects.empty? %>
+          <optgroup label="<%= c.name %>">
+            <% company_projects.each do |p| %>
+              <option value="<%= company_project_upload_path(c, p) %>"
+                    <%= "selected" if p == project %>>
+                <%= p.name %>
+              </option>
+            <% end %>
+          </optgroup>
+        <% end %>
+      </select>
+    <% else %>
+      <p class="<%= body_text_class %>">No projects yet. Create one to upload scope data.</p>
+    <% end %>
+  </div>
+
+  <%= link_to new_company_project_path(company), class: outline_button_class do %>
+    <span class="material-symbols-outlined text-[18px]">add</span>
+    New project
+  <% end %>
+</div>

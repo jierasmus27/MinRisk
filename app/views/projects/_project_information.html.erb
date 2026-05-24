@@ -1,6 +1,7 @@
 <% company_selection = local_assigns.fetch(:company_selection, company.id.to_s) %>
 <% companies = local_assigns.fetch(:companies, [ company ]) %>
 <% new_company = local_assigns.fetch(:new_company, Company.new) %>
+<% submit_label = local_assigns.fetch(:submit_label, "Save changes") %>
 
 <section class="md:col-span-5 <%= card_class %>">
   <div class="flex items-center justify-between <%= card_title_bar_class %>">
@@ -126,7 +127,7 @@
     </div>
 
     <div class="pt-2">
-      <%= f.submit "Save changes", class: primary_button_class %>
+      <%= f.submit submit_label, class: primary_button_class %>
     </div>
   <% end %>
 </section>

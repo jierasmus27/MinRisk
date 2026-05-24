@@ -60,6 +60,37 @@ class SpreadsheetParserTest < ActiveSupport::TestCase
     assert_includes row["errors"], "Rate × quantity must exactly equal Total Cost (Forecast)"
   end
 
+  test "allows commit when some rows are valid and others invalid" do
+    binary = build_workbook(
+      SpreadsheetImportTemplate::LINE_ITEM_HEADERS,
+      [
+        SpreadsheetImportTemplate::SAMPLE_ROWS.first,
+        [
+          "Bad row",
+          1000,
+          "Direct",
+          "Pkg",
+          "1",
+          "Civil",
+          10,
+          50,
+          nil,
+          nil,
+          nil
+        ]
+      ]
+    )
+    attach_binary!(@import, binary)
+
+    result = @import.parse!
+
+    assert @import.reload.preview_ready?
+    assert result.commitable?
+    refute result.summary[:error_count].zero?
+    assert_equal 1, @import.preview_summary["valid_row_count"]
+    assert_equal 1, @import.preview_summary["invalid_row_count"]
+  end
+
   test "parses numeric cells returned as Excel dates" do
     parser = SpreadsheetParser.new(@import)
     date_cell = SpreadsheetParser::EXCEL_EPOCH + 125_000

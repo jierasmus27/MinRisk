@@ -23,11 +23,11 @@ module ApplicationHelper
   end
 
   def projects_nav?
-    controller_name == "projects" && %w[show edit update].include?(action_name)
+    controller_name == "projects" && %w[show edit update new create].include?(action_name)
   end
 
   def scope_nav?
-    controller_name == "project_uploads" || (controller_name == "projects" && action_name == "new")
+    controller_name == "project_uploads"
   end
 
   def projects_nav_url

@@ -13,7 +13,11 @@ Rails.application.routes.draw do
     resources :projects do
       resource :upload, only: %i[show create], controller: "project_uploads" do
         get :template
-        resources :imports, only: %i[destroy], controller: "spreadsheet_imports"
+        resources :imports, only: %i[destroy], controller: "spreadsheet_imports" do
+          member do
+            post :commit
+          end
+        end
       end
     end
   end

@@ -1,4 +1,20 @@
-<div class="max-w-2xl mx-auto p-6">
-  <h1 class="font-headline-md text-headline-md text-primary mb-6">New project</h1>
-  <%= render "form", company: @company, project: @project %>
+<% content_for :title, "New Project - MinRisk" %>
+
+<%= render "shared/page_header",
+      title: "Project Settings",
+      subtitle: "Manage project details, team members, and system preferences." %>
+
+<div class="p-6 flex-1 max-w-7xl mx-auto w-full">
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+    <%= render "project_information",
+          company: @company,
+          project: @project,
+          companies: @companies,
+          new_company: @new_company,
+          company_selection: @company_selection,
+          submit_label: "Create project" %>
+    <div class="md:col-span-3 space-y-6">
+      <%= render "project_logo", company: @company, project: @project %>
+    </div>
+  </div>
 </div>

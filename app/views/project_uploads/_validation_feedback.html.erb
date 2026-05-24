@@ -12,10 +12,15 @@
           <span class="material-symbols-outlined text-[14px]">error</span>
           Parse failed
         </span>
-      <% elsif preview_import.commitable? %>
+      <% elsif preview_import.fully_valid? %>
         <span class="bg-tertiary-fixed border border-outline-variant text-on-tertiary-fixed px-2 py-1 rounded font-label-caps text-label-caps flex items-center gap-1">
           <span class="material-symbols-outlined text-[14px]">check_circle</span>
           Ready to commit
+        </span>
+      <% elsif preview_import.commitable? %>
+        <span class="bg-secondary-fixed border border-outline-variant text-on-secondary-fixed px-2 py-1 rounded font-label-caps text-label-caps flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]">partially_complete</span>
+          Partial import available
         </span>
       <% else %>
         <span class="bg-secondary-fixed border border-outline-variant text-on-secondary-fixed px-2 py-1 rounded font-label-caps text-label-caps flex items-center gap-1">
@@ -51,8 +56,8 @@
     <p class="<%= body_text_class %> mb-4">
       Preview for <span class="font-body-md text-body-md font-medium text-on-surface"><%= preview_import.file.filename %></span>
       <% if summary_text["invalid_row_count"].to_i.positive? %>
-        — <%= summary_text["invalid_row_count"] %> row(s) failed validation.
-      <% elsif preview_import.commitable? %>
+        — <%= summary_text["invalid_row_count"] %> row(s) failed validation; <%= summary_text["valid_row_count"] %> valid row(s) can be imported.
+      <% elsif preview_import.fully_valid? %>
         — all <%= summary_text["valid_row_count"] %> rows passed validation.
       <% end %>
     </p>

@@ -5,6 +5,7 @@ class ProjectUploadsController < AuthenticatedController
   before_action :set_project
 
   def show
+    @companies = Company.includes(:projects).order(:name)
     @imports = @project.spreadsheet_imports.includes(:line_items).with_attached_file.order(created_at: :desc).limit(10)
     @preview_import = load_preview_import
     @preview = @preview_import&.preview_payload

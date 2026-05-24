@@ -9,10 +9,11 @@ class ProjectsController < AuthenticatedController
   end
 
   def show
-    prepare_show_page
+    prepare_project_page
   end
 
   def new
+    prepare_project_page
     @project = @company.projects.new(
       currency_iso: "USD",
       time_zone: "UTC",
@@ -22,9 +23,16 @@ class ProjectsController < AuthenticatedController
   end
 
   def create
+    prepare_project_page
     @project = @company.projects.new(project_params)
+
+    unless assign_company_from_selection!
+      render :new, status: :unprocessable_entity
+      return
+    end
+
     if @project.save
-      redirect_to company_project_upload_path(@company, @project), notice: "Project created."
+      redirect_to company_project_path(@project.company, @project), notice: "Project created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -41,8 +49,8 @@ class ProjectsController < AuthenticatedController
       return
     end
 
-    unless apply_company_selection!
-      prepare_show_page
+    unless assign_company_from_selection!
+      prepare_project_page
       render :show, status: :unprocessable_entity
       return
     end
@@ -50,7 +58,7 @@ class ProjectsController < AuthenticatedController
     if @project.update(project_params)
       redirect_to company_project_path(@project.company, @project), notice: "Project updated."
     else
-      prepare_show_page
+      prepare_project_page
       render :show, status: :unprocessable_entity
     end
   end
@@ -79,13 +87,13 @@ class ProjectsController < AuthenticatedController
     )
   end
 
-  def prepare_show_page
+  def prepare_project_page
     @companies = Company.order(:name)
     @new_company ||= Company.new
     @company_selection = params[:company_selection].presence || @company.id.to_s
   end
 
-  def apply_company_selection!
+  def assign_company_from_selection!
     selection = params[:company_selection]
     return true if selection.blank? || selection == @company.id.to_s
 
@@ -95,18 +103,21 @@ class ProjectsController < AuthenticatedController
         @company_selection = "new"
         return false
       end
-      @project.update!(company: @new_company)
-      @company = @new_company
+      target_company = @new_company
     else
-      selected = Company.find_by(id: selection)
-      unless selected
+      target_company = Company.find_by(id: selection)
+      unless target_company
         @company_selection = selection
         return false
       end
-
-      @project.update!(company: selected)
-      @company = selected
     end
+
+    if @project.persisted?
+      @project.update!(company: target_company)
+    else
+      @project.company = target_company
+    end
+    @company = target_company
     true
   end
 

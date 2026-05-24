@@ -18,6 +18,34 @@ class SpreadsheetImportsControllerTest < ActionDispatch::IntegrationTest
     @import.parse!
   end
 
+  test "commit persists valid preview rows" do
+    assert_difference -> { @project.line_items.count }, +3 do
+      post commit_company_project_upload_import_path(@project.company, @project, @import)
+    end
+
+    assert_redirected_to company_project_upload_path(@project.company, @project)
+    assert_match(/Committed import\.xlsx: 3 line items added/, flash[:notice])
+    assert @import.reload.committed?
+  end
+
+  test "commit rejects import with no valid rows" do
+    @import.update!(
+      preview_payload: @import.preview_payload.merge(
+        "summary" => @import.preview_summary.merge(
+          "valid_row_count" => 0,
+          "invalid_row_count" => 3
+        )
+      )
+    )
+
+    assert_no_difference -> { @project.line_items.count } do
+      post commit_company_project_upload_import_path(@project.company, @project, @import)
+    end
+
+    assert_redirected_to company_project_upload_path(@project.company, @project, import_id: @import.id)
+    assert_match(/cannot be committed/, flash[:alert])
+  end
+
   test "destroy removes preview import" do
     assert_difference -> { @project.spreadsheet_imports.count }, -1 do
       delete company_project_upload_import_path(@project.company, @project, @import)

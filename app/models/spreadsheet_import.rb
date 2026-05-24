@@ -31,7 +31,27 @@ class SpreadsheetImport < ApplicationRecord
   end
 
   def commitable?
-    preview_ready? && preview_summary.present? && preview_summary["error_count"].to_i.zero?
+    preview_ready? && preview_summary.present? && preview_summary["valid_row_count"].to_i.positive?
+  end
+
+  def fully_valid?
+    commitable? && preview_summary["invalid_row_count"].to_i.zero?
+  end
+
+  def commit!
+    SpreadsheetImportCommit.new(self).call
+  end
+
+  def commit_confirmation_message
+    summary = preview_summary
+    valid = summary["valid_row_count"].to_i
+    invalid = summary["invalid_row_count"].to_i
+
+    if invalid.positive?
+      "Import #{valid} valid row#{'s' unless valid == 1}? #{invalid} invalid row#{'s' unless invalid == 1} will be skipped."
+    else
+      "Import #{valid} line item#{'s' unless valid == 1} into this project?"
+    end
   end
 
   def committed?

@@ -43,7 +43,7 @@ class SpreadsheetParser
     end
 
     def commitable?
-      preview_ready? && summary[:error_count].zero?
+      preview_ready? && summary[:valid_row_count].to_i.positive?
     end
 
     def to_h

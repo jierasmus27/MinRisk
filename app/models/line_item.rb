@@ -1,13 +1,19 @@
 # frozen_string_literal: true
 
 class LineItem < ApplicationRecord
-  has_paper_trail
   belongs_to :project
   belongs_to :spreadsheet_import, optional: true
   belongs_to :cost_type_value, class_name: "CategoryValue", optional: true
   belongs_to :package_value, class_name: "CategoryValue", optional: true
   belongs_to :wbs_value, class_name: "CategoryValue", optional: true
   belongs_to :discipline_value, class_name: "CategoryValue", optional: true
+
+  # Money amounts can exceed 32-bit integer cents; force 64-bit casting even if
+  # the schema cache was loaded before the widen_line_item_money_columns migration.
+  attribute :rate_cents, :big_integer
+  attribute :total_cost_forecast_cents, :big_integer
+  attribute :cost_min_cents, :big_integer
+  attribute :cost_max_cents, :big_integer
 
   monetize :total_cost_forecast_cents, with_model_currency: :currency_iso
   monetize :rate_cents, with_model_currency: :currency_iso

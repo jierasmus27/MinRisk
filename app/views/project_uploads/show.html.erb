@@ -1,7 +1,7 @@
 <% content_for :title, "Data Upload & Validation - MinRisk" %>
 
 <%= render "shared/page_header",
-      title: "Data Upload & Validation",
+      title: "Scope & Inputs",
       subtitle: "Import cost estimation data sources and configure parameters for risk analysis." %>
 
 <div class="p-6 flex-1 flex flex-col gap-6 max-w-7xl mx-auto w-full">
@@ -81,27 +81,8 @@
     </div>
 
     <div class="<%= card_class %> flex flex-col">
-      <h2 class="<%= card_title_class %> <%= card_title_bar_class %>">Scope Parameters</h2>
-      <%= form_with model: [@company, @project], class: "flex flex-col gap-4" do |f| %>
-        <div>
-          <%= f.label :estimate_accuracy_class, "Estimate accuracy class", class: field_label_class %>
-          <%= f.select :estimate_accuracy_class,
-                estimate_accuracy_options,
-                { include_blank: "—" },
-                class: field_input_class %>
-        </div>
-        <div>
-          <label class="<%= field_label_class %>">Currency (read-only)</label>
-          <div class="w-full bg-surface-container border border-outline-variant rounded p-2 font-tabular-numeric text-tabular-numeric text-on-surface">
-            <%= @project.currency_iso %>
-          </div>
-        </div>
-        <div>
-          <%= f.label :base_year, class: field_label_class %>
-          <%= f.number_field :base_year, class: field_input_class %>
-        </div>
-        <%= f.submit "Save scope parameters", class: primary_button_class %>
-      <% end %>
+      <h2 class="<%= card_title_class %> <%= card_title_bar_class %>">Project</h2>
+      <%= render "project_selector", companies: @companies, company: @company, project: @project %>
     </div>
   </div>
 
@@ -112,9 +93,19 @@
         preview: @preview %>
 
   <div class="flex justify-end mt-2 pt-6 border-t border-outline-variant">
-    <button type="button" disabled title="<%= @preview_import&.commitable? ? "Commit will be wired in the next step" : "Fix validation issues or upload a file first" %>" class="opacity-50 cursor-not-allowed bg-secondary-container text-on-secondary font-label-caps text-label-caps px-8 py-4 rounded shadow-sm flex items-center gap-2 uppercase tracking-wide">
-      <span class="material-symbols-outlined">save</span>
-      Commit import
-    </button>
+    <% if @preview_import&.commitable? %>
+      <%= button_to commit_company_project_upload_import_path(@company, @project, @preview_import),
+            method: :post,
+            form: { data: { turbo: false, turbo_confirm: @preview_import.commit_confirmation_message } },
+            class: "bg-secondary-container text-on-secondary font-label-caps text-label-caps px-8 py-4 rounded shadow-sm flex items-center gap-2 uppercase tracking-wide hover:opacity-90 transition-opacity" do %>
+        <span class="material-symbols-outlined">save</span>
+        Commit import
+      <% end %>
+    <% else %>
+      <button type="button" disabled title="Fix validation issues or upload a file first" class="opacity-50 cursor-not-allowed bg-secondary-container text-on-secondary font-label-caps text-label-caps px-8 py-4 rounded shadow-sm flex items-center gap-2 uppercase tracking-wide">
+        <span class="material-symbols-outlined">save</span>
+        Commit import
+      </button>
+    <% end %>
   </div>
 </div>

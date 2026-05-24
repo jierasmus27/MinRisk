@@ -13,6 +13,49 @@ class SpreadsheetImportTest < ActiveSupport::TestCase
     assert_equal "Remove this import preview? This cannot be undone.", @import.destroy_confirmation_message
   end
 
+  test "commitable when preview has valid rows" do
+    @import.update!(
+      preview_payload: {
+        "summary" => {
+          "valid_row_count" => 2,
+          "invalid_row_count" => 1,
+          "error_count" => 1
+        }
+      }
+    )
+
+    assert @import.commitable?
+    refute @import.fully_valid?
+  end
+
+  test "not commitable when preview has no valid rows" do
+    @import.update!(
+      preview_payload: {
+        "summary" => {
+          "valid_row_count" => 0,
+          "invalid_row_count" => 3,
+          "error_count" => 3
+        }
+      }
+    )
+
+    refute @import.commitable?
+  end
+
+  test "commit_confirmation_message describes partial import" do
+    @import.update!(
+      preview_payload: {
+        "summary" => {
+          "valid_row_count" => 2,
+          "invalid_row_count" => 1
+        }
+      }
+    )
+
+    assert_match(/2 valid rows/, @import.commit_confirmation_message)
+    assert_match(/1 invalid row will be skipped/, @import.commit_confirmation_message)
+  end
+
   test "destroy_confirmation_message includes line item count" do
     @import.line_items.create!(
       project: @project,
