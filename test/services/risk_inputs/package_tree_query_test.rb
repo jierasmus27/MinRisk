@@ -15,9 +15,9 @@ module RiskInputs
       @type_direct = @project.category_values.create!(dimension: :cost_type, name: "Direct")
       @type_indirect = @project.category_values.create!(dimension: :cost_type, name: "Indirect")
 
-      @project.line_items.create!(quantity: 1, rate_cents: 100_00, total_cost_forecast_cents: 100_00, package_value: @package_a, wbs_value: @wbs_a, cost_type_value: @type_direct)
-      @project.line_items.create!(quantity: 1, rate_cents: 200_00, total_cost_forecast_cents: 200_00, package_value: @package_a, wbs_value: @wbs_b, cost_type_value: @type_indirect)
-      @project.line_items.create!(quantity: 1, rate_cents: 50_00, total_cost_forecast_cents: 50_00, package_value: @package_b, wbs_value: @wbs_b, cost_type_value: @type_direct)
+      @project.line_items.create!(quantity: 1, rate_cents: 100_00, total_cost_forecast_cents: 100_00, driver: "package", package_value: @package_a, wbs_value: @wbs_a, cost_type_value: @type_direct)
+      @project.line_items.create!(quantity: 1, rate_cents: 200_00, total_cost_forecast_cents: 200_00, driver: "package", package_value: @package_a, wbs_value: @wbs_b, cost_type_value: @type_indirect)
+      @project.line_items.create!(quantity: 1, rate_cents: 50_00, total_cost_forecast_cents: 50_00, driver: "package", package_value: @package_b, wbs_value: @wbs_b, cost_type_value: @type_direct)
 
       @project.package_risk_drivers.create!(
         package_value: @package_a,

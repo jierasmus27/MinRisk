@@ -15,6 +15,7 @@ class SpreadsheetImportTemplate
     "Package",
     "WBS",
     "Discipline",
+    "Driver",
     "Rate",
     "Quantity",
     "Total Cost (Minimum)",
@@ -26,6 +27,7 @@ class SpreadsheetImportTemplate
   HEADERS = LINE_ITEM_HEADERS
 
   DISTRIBUTION_TYPES = %w[Triangular Uniform Normal Lognormal].freeze
+  DRIVERS = %w[package WBS discipline].freeze
 
   # Example rows: rate * quantity must equal Total Cost (Forecast) exactly.
   SAMPLE_ROWS = [
@@ -36,6 +38,7 @@ class SpreadsheetImportTemplate
       "01 - Earthworks",
       "1.1",
       "Civil",
+      "package",
       250,
       500,
       100_000,
@@ -49,6 +52,7 @@ class SpreadsheetImportTemplate
       "02 - Concrete Substructures",
       "1.2",
       "Structural",
+      "package",
       120,
       4000,
       400_000,
@@ -62,6 +66,7 @@ class SpreadsheetImportTemplate
       "03 - Structural Steel",
       "2.1",
       "Structural",
+      "package",
       75,
       12_000,
       750_000,
@@ -98,7 +103,8 @@ class SpreadsheetImportTemplate
     [ "Optional (Monte Carlo)", "Total Cost (Minimum), Total Cost (Maximum), Cost Distribution Type",
       "Defaults to Triangular when min/max are present; other types need extra columns later" ],
     [],
-    [ "Allowed Cost Distribution Type values", DISTRIBUTION_TYPES.join(", ") ]
+    [ "Allowed Cost Distribution Type values", DISTRIBUTION_TYPES.join(", ") ],
+    [ "Allowed Driver values", DRIVERS.join(", ") ]
   ].freeze
 
   def self.to_binary
@@ -118,7 +124,7 @@ class SpreadsheetImportTemplate
       number_style = number_cell_style(workbook)
       sheet.add_row LINE_ITEM_HEADERS, style: header_style(workbook)
       SAMPLE_ROWS.each { |row| sheet.add_row row, style: line_item_row_styles(number_style) }
-      sheet.column_widths 32, 18, 14, 28, 10, 14, 12, 12, 18, 18, 22
+      sheet.column_widths 32, 18, 14, 28, 10, 14, 12, 12, 12, 18, 18, 22
     end
 
     package.to_stream.read
@@ -148,6 +154,7 @@ class SpreadsheetImportTemplate
       nil, # Package
       nil, # WBS
       nil, # Discipline
+      nil, # Driver
       number_style, # Rate
       number_style, # Quantity
       number_style, # Total Cost (Minimum)

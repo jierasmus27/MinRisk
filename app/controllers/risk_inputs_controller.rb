@@ -16,6 +16,7 @@ class RiskInputsController < AuthenticatedController
     @summary = @project.import_summary
     @packages_with_drivers_count = @project.package_risk_drivers.distinct.count(:package_value_id)
     @total_package_count = @project.cost_package_count
+    @selected_package_ids = selected_package_ids_from_params
   end
 
   def update
@@ -37,8 +38,12 @@ class RiskInputsController < AuthenticatedController
       max_pct: apply_params[:max_pct]
     ).call
 
-    redirect_to company_project_risk_inputs_path(@company, @project, preserved_filter_params),
-                notice: "Applied #{apply_params[:driver_type].humanize} settings to #{applied_count} package#{'s' unless applied_count == 1}."
+    redirect_to company_project_risk_inputs_path(
+      @company,
+      @project,
+      preserved_filter_params.merge(selected: apply_params[:package_value_ids])
+    ),
+    notice: "Applied #{apply_params[:driver_type].humanize} settings to #{applied_count} package#{'s' unless applied_count == 1}."
   rescue ActiveRecord::RecordInvalid, ArgumentError => e
     redirect_to company_project_risk_inputs_path(@company, @project, preserved_filter_params), alert: e.message
   end
@@ -85,5 +90,13 @@ class RiskInputsController < AuthenticatedController
 
   def default_driver_card(driver_type)
     PackageRiskDriver.defaults_for(driver_type).merge(driver_type:)
+  end
+
+  def selected_package_ids_from_params
+    Array(params[:selected]).filter_map do |id|
+      next if id.blank?
+
+      id.to_i
+    end.uniq
   end
 end

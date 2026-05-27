@@ -1,3 +1,5 @@
+<% selected_package_ids = local_assigns.fetch(:selected_package_ids, []) %>
+
 <div class="overflow-x-auto border border-outline-variant rounded">
   <table class="w-full text-left font-body-md text-body-md">
     <thead class="bg-surface-container-low font-label-caps text-label-caps text-on-surface-variant uppercase">
@@ -37,7 +39,8 @@
                 class="rounded border-outline-variant"
                 data-risk-inputs-target="packageCheckbox"
                 data-action="change->risk-inputs#selectionChanged"
-                data-driver-values="<%= package_driver_data.to_json %>">
+                data-driver-values="<%= package_driver_data.to_json %>"
+                <%= "checked" if package_id.present? && selected_package_ids.include?(package_id) %>>
             <% else %>
               <span class="text-on-surface-variant text-xs">N/A</span>
             <% end %>
@@ -66,7 +69,9 @@
                 <span class="px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant text-[10px] uppercase">None</span>
               <% else %>
                 <% pkg[:linked_drivers].each do |driver| %>
-                  <span class="px-2 py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed text-[10px] uppercase"><%= driver %></span>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase <%= risk_driver_badge_class(driver) %>">
+                    <%= risk_driver_badge_label(driver) %>
+                  </span>
                 <% end %>
               <% end %>
             </div>

@@ -13,6 +13,7 @@ class SpreadsheetParser
     "package" => :package,
     "wbs" => :wbs,
     "discipline" => :discipline,
+    "driver" => :driver,
     "rate" => :rate,
     "quantity" => :quantity,
     "total cost (minimum)" => :cost_min,
@@ -20,11 +21,12 @@ class SpreadsheetParser
     "cost distribution type" => :cost_distribution
   }.freeze
 
-  REQUIRED_FIELDS = %i[total_cost_forecast rate quantity].freeze
+  REQUIRED_FIELDS = %i[total_cost_forecast rate quantity driver].freeze
   REQUIRED_FIELD_LABELS = {
     total_cost_forecast: "Total Cost (Forecast)",
     rate: "Rate",
-    quantity: "Quantity"
+    quantity: "Quantity",
+    driver: "Driver"
   }.freeze
   LINE_ITEMS_SHEET = "Line Items"
 
@@ -196,6 +198,7 @@ class SpreadsheetParser
     cost_min = monetize_parsed_amount(values[:cost_min], cost_min_amount, errors, "Total Cost (Minimum)", required: false)
     cost_max = monetize_parsed_amount(values[:cost_max], cost_max_amount, errors, "Total Cost (Maximum)", required: false)
     distribution = parse_distribution(values[:cost_distribution], errors, warnings)
+    driver = parse_driver(values[:driver], errors)
 
     if formula_without_cached_value?(values[:rate])
       warnings << "Rate formula has no calculated value; save the workbook in Excel before uploading"
@@ -215,6 +218,7 @@ class SpreadsheetParser
       package: values[:package].to_s.strip.presence,
       wbs: values[:wbs].to_s.strip.presence,
       discipline: values[:discipline].to_s.strip.presence,
+      driver: driver,
       cost_min_cents: cost_min&.cents,
       cost_max_cents: cost_max&.cents,
       cost_distribution: distribution,
@@ -271,6 +275,22 @@ class SpreadsheetParser
   rescue Money::Currency::UnknownCurrency
     errors << "Project currency is not configured"
     nil
+  end
+
+  def parse_driver(value, errors)
+    if value.nil? || value.to_s.strip.empty?
+      errors << "Driver is required"
+      return nil
+    end
+
+    normalized = value.to_s.strip.downcase
+    normalized = "package" if normalized == "packages"
+    unless LineItem::DRIVERS.include?(normalized)
+      errors << "Driver must be one of: #{LineItem::DRIVERS.join(', ')}"
+      return nil
+    end
+
+    normalized
   end
 
   def parse_distribution(value, errors, warnings)

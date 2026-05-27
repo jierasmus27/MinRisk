@@ -19,6 +19,7 @@ class RiskInputsControllerTest < ActionDispatch::IntegrationTest
       quantity: 1,
       rate_cents: 125_00,
       total_cost_forecast_cents: 125_00,
+      driver: "package",
       package_value: @package,
       wbs_value: @wbs,
       cost_type_value: @cost_type
@@ -57,7 +58,18 @@ class RiskInputsControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    assert_redirected_to company_project_risk_inputs_path(@company, @project)
+    assert_redirected_to company_project_risk_inputs_path(@company, @project, selected: [ @package.id ])
     assert_equal 1, @project.package_risk_drivers.where(package_value: @package, driver_type: "price").count
+
+    follow_redirect!
+    assert_select "input[type=checkbox][value='#{@package.id}'][checked]"
+    assert_select "span", text: "Price"
+  end
+
+  test "show preserves selected packages from query params" do
+    get company_project_risk_inputs_path(@company, @project, selected: [ @package.id ])
+
+    assert_response :success
+    assert_select "input[type=checkbox][value='#{@package.id}'][checked]"
   end
 end

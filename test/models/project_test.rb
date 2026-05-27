@@ -20,10 +20,10 @@ class ProjectTest < ActiveSupport::TestCase
     package_a = @project.category_values.create!(dimension: :package, name: "Civil")
     package_b = @project.category_values.create!(dimension: :package, name: "MEP")
 
-    @project.line_items.create!(quantity: 1, rate_cents: 100_00, total_cost_forecast_cents: 100_00, package_value: package_a)
-    @project.line_items.create!(quantity: 2, rate_cents: 50_00, total_cost_forecast_cents: 100_00, package_value: package_a)
-    @project.line_items.create!(quantity: 1, rate_cents: 75_00, total_cost_forecast_cents: 75_00, package_value: package_b)
-    @project.line_items.create!(quantity: 1, rate_cents: 25_00, total_cost_forecast_cents: 25_00)
+    @project.line_items.create!(quantity: 1, rate_cents: 100_00, total_cost_forecast_cents: 100_00, driver: "package", package_value: package_a)
+    @project.line_items.create!(quantity: 2, rate_cents: 50_00, total_cost_forecast_cents: 100_00, driver: "package", package_value: package_a)
+    @project.line_items.create!(quantity: 1, rate_cents: 75_00, total_cost_forecast_cents: 75_00, driver: "package", package_value: package_b)
+    @project.line_items.create!(quantity: 1, rate_cents: 25_00, total_cost_forecast_cents: 25_00, driver: "package")
 
     summary = @project.import_summary
 

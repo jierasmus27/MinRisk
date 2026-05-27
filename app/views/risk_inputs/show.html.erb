@@ -40,7 +40,8 @@
     <%= render "package_tree",
           package_rows: @package_rows,
           project: @project,
-          driver_records_by_package: @driver_records_by_package %>
+          driver_records_by_package: @driver_records_by_package,
+          selected_package_ids: @selected_package_ids %>
 
     <%= render "summary_footer",
           summary: @summary,

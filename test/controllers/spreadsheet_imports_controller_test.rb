@@ -67,7 +67,8 @@ class SpreadsheetImportsControllerTest < ActionDispatch::IntegrationTest
       project: @project,
       quantity: 1,
       rate_cents: 100_00,
-      total_cost_forecast_cents: 100_00
+      total_cost_forecast_cents: 100_00,
+      driver: "package"
     )
 
     get commit_status_company_project_upload_import_path(@project.company, @project, @import)
@@ -106,7 +107,8 @@ class SpreadsheetImportsControllerTest < ActionDispatch::IntegrationTest
       spreadsheet_import: @import,
       quantity: 1,
       rate_cents: 100_00,
-      total_cost_forecast_cents: 100_00
+      total_cost_forecast_cents: 100_00,
+      driver: "package"
     )
 
     assert_difference [ -> { @project.spreadsheet_imports.count }, -> { @project.line_items.count } ], -1 do

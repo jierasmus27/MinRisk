@@ -31,6 +31,7 @@ class ProjectUploadsControllerTest < ActionDispatch::IntegrationTest
       quantity: 1,
       rate_cents: 100_00,
       total_cost_forecast_cents: 100_00,
+      driver: "package",
       package_value: package
     )
 

@@ -20,6 +20,7 @@ class SpreadsheetImportCommitTest < ActiveSupport::TestCase
 
     assert @import.reload.committed?
     assert_equal 3, @import.line_items.count
+    assert @import.line_items.all? { |item| item.driver == "package" }
   end
 
   test "skips invalid rows on partial import" do
@@ -34,6 +35,7 @@ class SpreadsheetImportCommitTest < ActiveSupport::TestCase
           "Pkg",
           "1",
           "Civil",
+          "package",
           10,
           50,
           nil,
@@ -95,6 +97,7 @@ class SpreadsheetImportCommitTest < ActiveSupport::TestCase
             "package" => nil,
             "wbs" => nil,
             "discipline" => nil,
+            "driver" => "package",
             "errors" => []
           }
         ],

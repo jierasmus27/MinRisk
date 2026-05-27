@@ -44,6 +44,7 @@ class SpreadsheetImportCommit
       cost_min_cents: cents_value(row["cost_min_cents"]),
       cost_max_cents: cents_value(row["cost_max_cents"]),
       cost_distribution: row["cost_distribution"],
+      driver: row["driver"],
       cost_type_value: category_value_for(:cost_type, row["cost_type"]),
       package_value: category_value_for(:package, row["package"]),
       wbs_value: category_value_for(:wbs, row["wbs"]),

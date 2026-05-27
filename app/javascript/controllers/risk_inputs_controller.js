@@ -4,6 +4,10 @@ export default class extends Controller {
   static targets = ["packageCheckbox", "driverForm", "packageIds", "applyButton", "packageLineRow", "distributionViz"]
 
   connect() {
+    this.driverFormTargets.forEach((form) => {
+      const distributionField = form.querySelector('[data-role="distribution"]')
+      if (distributionField) this.updateDistribution({ target: distributionField })
+    })
     this.selectionChanged()
   }
 
@@ -55,11 +59,10 @@ export default class extends Controller {
     const maxValue = form.querySelector('[data-role="max"]')?.value
     const driverType = form.dataset.driverType
     const viz = this.distributionVizTargets.find((item) => item.dataset.driverType === driverType)
-    if (!viz) return
+    if (!viz || !distribution) return
 
-    viz.querySelectorAll("[data-shape]").forEach((shape) => {
-      const shapeName = shape.dataset.shape
-      shape.classList.toggle("hidden", !shapeName.startsWith(distribution))
+    viz.querySelectorAll("[data-distribution]").forEach((group) => {
+      group.classList.toggle("hidden", group.dataset.distribution !== distribution)
     })
 
     const minLabel = viz.querySelector('[data-role="viz-min"]')

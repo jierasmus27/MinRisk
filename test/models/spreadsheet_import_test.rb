@@ -61,7 +61,8 @@ class SpreadsheetImportTest < ActiveSupport::TestCase
       project: @project,
       quantity: 1,
       rate_cents: 100,
-      total_cost_forecast_cents: 100
+      total_cost_forecast_cents: 100,
+      driver: "package"
     )
 
     assert_equal "Remove this import and 1 line item? This cannot be undone.", @import.destroy_confirmation_message
@@ -72,7 +73,8 @@ class SpreadsheetImportTest < ActiveSupport::TestCase
       project: @project,
       quantity: 2,
       rate_cents: 50,
-      total_cost_forecast_cents: 100
+      total_cost_forecast_cents: 100,
+      driver: "package"
     )
 
     assert_difference -> { LineItem.count }, -1 do

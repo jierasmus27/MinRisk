@@ -41,6 +41,7 @@ class SpreadsheetParserTest < ActiveSupport::TestCase
           "Pkg",
           "1",
           "Civil",
+          "package",
           10,
           50,
           nil,
@@ -72,6 +73,7 @@ class SpreadsheetParserTest < ActiveSupport::TestCase
           "Pkg",
           "1",
           "Civil",
+          "package",
           10,
           50,
           nil,
@@ -111,7 +113,7 @@ class SpreadsheetParserTest < ActiveSupport::TestCase
     workbook.add_worksheet(name: "Line Items") do |sheet|
       sheet.add_row SpreadsheetImportTemplate::LINE_ITEM_HEADERS
       sheet.add_row(
-        [ "Test", 125_000, "Direct", "Pkg", "1.1", "Civil", 250, 500, 100_000, 150_000, "Triangular" ],
+        [ "Test", 125_000, "Direct", "Pkg", "1.1", "Civil", "package", 250, 500, 100_000, 150_000, "Triangular" ],
         style: [ nil, date_style, nil, nil, nil, nil, date_style, date_style, date_style, date_style, nil ]
       )
     end
@@ -127,8 +129,8 @@ class SpreadsheetParserTest < ActiveSupport::TestCase
     package = Axlsx::Package.new
     sheet = package.workbook.add_worksheet(name: "Line Items")
     sheet.add_row SpreadsheetImportTemplate::LINE_ITEM_HEADERS
-    row = sheet.add_row [ "Formula row", 1000, "Direct", "Pkg", "1", "Civil", nil, 100, nil, nil, "Triangular" ]
-    rate_cell = row.cells[6]
+    row = sheet.add_row [ "Formula row", 1000, "Direct", "Pkg", "1", "Civil", "package", nil, 100, nil, nil, "Triangular" ]
+    rate_cell = row.cells[7]
     rate_cell.formula_value = "B2/H2"
     rate_cell.value = 10
 
@@ -145,6 +147,78 @@ class SpreadsheetParserTest < ActiveSupport::TestCase
   test "parses float values from spreadsheets" do
     parser = SpreadsheetParser.new(@import)
     assert_equal BigDecimal("60316.0"), parser.send(:parse_decimal, 60316.0)
+  end
+
+  test "flags missing or invalid driver" do
+    binary = build_workbook(
+      SpreadsheetImportTemplate::LINE_ITEM_HEADERS,
+      [
+        [
+          "No driver",
+          1000,
+          "Direct",
+          "Pkg",
+          "1",
+          "Civil",
+          nil,
+          10,
+          100,
+          nil,
+          nil,
+          nil
+        ],
+        [
+          "Bad driver",
+          1000,
+          "Direct",
+          "Pkg",
+          "1",
+          "Civil",
+          "invalid",
+          10,
+          100,
+          nil,
+          nil,
+          nil
+        ]
+      ]
+    )
+    attach_binary!(@import, binary)
+
+    @import.parse!
+
+    rows = @import.preview_payload["rows"]
+    assert_includes rows[0]["errors"], "Driver is required"
+    assert_includes rows[1]["errors"], "Driver must be one of: package, wbs, discipline"
+  end
+
+  test "normalizes WBS driver casing" do
+    binary = build_workbook(
+      SpreadsheetImportTemplate::LINE_ITEM_HEADERS,
+      [
+        [
+          "WBS row",
+          1000,
+          "Direct",
+          "Pkg",
+          "1",
+          "Civil",
+          "WBS",
+          10,
+          100,
+          nil,
+          nil,
+          nil
+        ]
+      ]
+    )
+    attach_binary!(@import, binary)
+
+    @import.parse!
+
+    row = @import.preview_payload["rows"].first
+    assert_empty row["errors"]
+    assert_equal "wbs", row["driver"]
   end
 
   test "fails when required headers are missing" do

@@ -9,6 +9,7 @@ one:
   cost_min_cents: 1
   cost_max_cents: 1
   cost_distribution: MyString
+  driver: package
 
 two:
   project: two
@@ -19,3 +20,4 @@ two:
   cost_min_cents: 1
   cost_max_cents: 1
   cost_distribution: MyString
+  driver: package
