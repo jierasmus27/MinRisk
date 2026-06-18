@@ -21,7 +21,7 @@ gem "jbuilder"
 gem "bcrypt", "~> 3.1.7"
 
 gem "tailwindcss-rails", "~> 3.3"
-gem "money-rails", "~> 1.15"
+gem "money-rails", "~> 3.0"
 gem "roo", "~> 2.10"
 gem "caxlsx", "~> 4.2"
 gem "csv"
