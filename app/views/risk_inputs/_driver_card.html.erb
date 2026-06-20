@@ -1,5 +1,5 @@
 <% driver_title = "#{driver_type.humanize} Accuracy" %>
-<% source_options = PackageRiskDriver::SOURCE_ACCURACY_CLASSES.map { |value, label| [label, value] } %>
+<% source_options = RiskDriverSettings::SOURCE_ACCURACY_CLASSES.map { |value, label| [label, value] } %>
 
 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm space-y-3">
   <div class="flex items-center justify-between">
@@ -47,14 +47,15 @@
       </div>
     </div>
 
-    <div data-risk-inputs-target="packageIds"></div>
+    <div data-risk-inputs-target="groupKeys"></div>
+    <div data-risk-inputs-target="lineItemIds"></div>
 
     <button type="submit"
             class="w-full bg-primary-container text-on-primary-container py-2 rounded font-label-caps text-label-caps hover:opacity-90 transition-opacity uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
             data-risk-inputs-target="applyButton"
             data-driver-type="<%= driver_type %>"
             disabled>
-      Apply to 0 selected packages
+      Apply to 0 selected
     </button>
   <% end %>
 </div>

@@ -1,0 +1,55 @@
+<% setting = local_assigns.fetch(:setting, nil) %>
+<% driver_type = local_assigns.fetch(:driver_type, nil) %>
+<% overridden = local_assigns.fetch(:overridden, false) %>
+<% source = risk_source_accuracy_parts(setting&.dig(:source_accuracy_class)) %>
+
+<% if setting.blank? %>
+  <div class="flex items-center justify-center min-h-[4.5rem] rounded-lg border border-dashed border-outline-variant bg-surface-container-low px-3 py-2">
+    <span class="text-xs text-on-surface-variant">Not configured</span>
+  </div>
+<% else %>
+  <div class="rounded-lg border border-outline-variant bg-surface-container-lowest border-l-[3px] <%= risk_setting_cell_accent_class(driver_type) %> px-3 py-2.5 min-w-[9.5rem]">
+    <div class="flex items-start justify-between gap-2">
+      <div class="min-w-0">
+        <p class="text-sm font-semibold text-on-surface leading-tight truncate"><%= source[:title] %></p>
+        <% if source[:subtitle].present? %>
+          <p class="text-xs text-on-surface-variant leading-snug truncate"><%= source[:subtitle] %></p>
+        <% end %>
+      </div>
+      <% if overridden %>
+        <span class="shrink-0 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-amber-50 text-amber-800 border border-amber-100">
+          Override
+        </span>
+      <% end %>
+    </div>
+
+    <div class="mt-1.5">
+      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-surface-container-high text-on-surface border border-outline-variant">
+        <%= risk_distribution_label(setting[:distribution_type]) %>
+      </span>
+    </div>
+
+    <div class="mt-2.5 pt-2 border-t border-outline-variant">
+      <div class="grid grid-cols-3 gap-2 text-center">
+        <div>
+          <p class="font-label-caps text-label-caps text-[10px] text-on-surface-variant uppercase tracking-wide">Min</p>
+          <p class="mt-0.5 text-sm font-semibold font-tabular-numeric text-tabular-numeric text-on-surface">
+            <%= risk_percentile_value(setting[:min_pct]) %>
+          </p>
+        </div>
+        <div>
+          <p class="font-label-caps text-label-caps text-[10px] text-on-surface-variant uppercase tracking-wide">Likely</p>
+          <p class="mt-0.5 text-sm font-semibold font-tabular-numeric text-tabular-numeric text-on-surface">
+            <%= risk_percentile_value(setting[:mode_pct]) %>
+          </p>
+        </div>
+        <div>
+          <p class="font-label-caps text-label-caps text-[10px] text-on-surface-variant uppercase tracking-wide">Max</p>
+          <p class="mt-0.5 text-sm font-semibold font-tabular-numeric text-tabular-numeric text-on-surface">
+            <%= risk_percentile_value(setting[:max_pct]) %>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

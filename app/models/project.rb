@@ -5,7 +5,7 @@ class Project < ApplicationRecord
   belongs_to :company
   has_many :category_values, dependent: :destroy
   has_many :line_items, dependent: :destroy
-  has_many :package_risk_drivers, dependent: :destroy
+  has_many :driver_risk_settings, dependent: :destroy
   has_many :spreadsheet_imports, dependent: :destroy
   has_one_attached :logo
 
@@ -33,6 +33,28 @@ class Project < ApplicationRecord
     with_package = line_items.where.not(package_value_id: nil).distinct.count(:package_value_id)
     without_package = line_items.where(package_value_id: nil).exists? ? 1 : 0
     with_package + without_package
+  end
+
+  def driver_group_count
+    line_items
+      .pluck(:driver, :package_value_id, :wbs_value_id, :discipline_value_id)
+      .map { |driver, package_id, wbs_id, discipline_id|
+        category_value_id = case driver
+        when "package" then package_id
+        when "wbs" then wbs_id
+        when "discipline" then discipline_id
+        end
+        DriverRiskSetting.group_key_for(driver_dimension: driver, category_value_id: category_value_id)
+      }
+      .uniq
+      .count
+  end
+
+  def driver_groups_with_settings_count
+    driver_risk_settings
+      .select(:driver_dimension, :category_value_id)
+      .distinct
+      .count
   end
 
   private

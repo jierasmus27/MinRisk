@@ -1,0 +1,105 @@
+<% selected_group_keys = local_assigns.fetch(:selected_group_keys, []) %>
+<% selected_line_item_ids = local_assigns.fetch(:selected_line_item_ids, []) %>
+
+<div class="overflow-x-auto border border-outline-variant rounded">
+  <table class="w-full text-left font-body-md text-body-md">
+    <thead class="bg-surface-container-low font-label-caps text-label-caps text-on-surface-variant uppercase">
+      <tr>
+        <th class="px-4 py-2 w-24">Select</th>
+        <th class="px-4 py-2">Driver Group</th>
+        <th class="px-4 py-2 text-right">Line Items</th>
+        <th class="px-4 py-2 text-right">Amount (Base)</th>
+        <% RiskDriverSettings::DRIVER_TYPES.each do |driver_type| %>
+          <th class="px-3 py-2 min-w-[11rem]">
+            <span class="inline-flex items-center gap-1.5">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase <%= risk_driver_badge_class(driver_type) %>">
+                <%= risk_driver_badge_label(driver_type) %>
+              </span>
+              <span class="normal-case tracking-normal font-body-md">Accuracy</span>
+            </span>
+          </th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% if driver_group_rows.empty? %>
+        <tr class="border-t border-outline-variant">
+          <td colspan="<%= 4 + RiskDriverSettings::DRIVER_TYPES.length %>" class="px-4 py-4 text-on-surface-variant">No driver groups matched the selected filters.</td>
+        </tr>
+      <% end %>
+
+      <% driver_group_rows.each do |group| %>
+        <% expandable = group[:line_items].any? %>
+        <tr class="border-t border-outline-variant bg-surface-container-lowest">
+          <td class="px-4 py-3">
+            <input
+              type="checkbox"
+              value="<%= group[:group_key] %>"
+              class="rounded border-outline-variant"
+              data-risk-inputs-target="groupCheckbox"
+              data-action="change->risk-inputs#selectionChanged"
+              data-driver-values="<%= risk_settings_json(group[:risk_settings_by_type]) %>"
+              <%= "checked" if selected_group_keys.include?(group[:group_key]) %>>
+          </td>
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-2">
+              <% if expandable %>
+                <button type="button"
+                        class="inline-flex items-center justify-center w-7 h-7 rounded border border-outline-variant text-on-surface-variant hover:bg-surface-container-low"
+                        data-action="click->risk-inputs#toggleGroupRows"
+                        data-group-key="<%= group[:group_key] %>"
+                        aria-expanded="false">
+                  <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                </button>
+              <% else %>
+                <span class="inline-block w-7"></span>
+              <% end %>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase <%= spreadsheet_driver_badge_class(group[:driver_dimension]) %>">
+                <%= spreadsheet_driver_label(group[:driver_dimension]) %>
+              </span>
+              <span class="font-semibold text-on-surface"><%= group[:name] %></span>
+            </div>
+          </td>
+          <td class="px-4 py-3 text-right font-tabular-numeric text-tabular-numeric"><%= group[:line_item_count] %></td>
+          <td class="px-4 py-3 text-right font-tabular-numeric text-tabular-numeric"><%= preview_money(group[:amount_cents], project.currency_iso) %></td>
+          <% RiskDriverSettings::DRIVER_TYPES.each do |driver_type| %>
+            <td class="px-3 py-3 align-top">
+              <%= render "risk_setting_cell",
+                    setting: group[:risk_settings_by_type][driver_type],
+                    driver_type: driver_type %>
+            </td>
+          <% end %>
+        </tr>
+        <% group[:line_items].each do |line_item| %>
+          <tr class="border-t border-outline-variant bg-surface hidden"
+              data-risk-inputs-target="groupLineRow"
+              data-parent-group-key="<%= group[:group_key] %>">
+            <td class="px-4 py-2">
+              <input
+                type="checkbox"
+                value="<%= line_item[:id] %>"
+                class="rounded border-outline-variant ml-4"
+                data-risk-inputs-target="lineItemCheckbox"
+                data-action="change->risk-inputs#selectionChanged"
+                data-driver-values="<%= risk_settings_json(line_item[:risk_settings_by_type]) %>"
+                <%= "checked" if selected_line_item_ids.include?(line_item[:id]) %>>
+            </td>
+            <td class="px-4 py-2 text-on-surface-variant pl-12">
+              <%= line_item[:label] %>
+            </td>
+            <td class="px-4 py-2 text-right text-on-surface-variant">Line #<%= line_item[:id] %></td>
+            <td class="px-4 py-2 text-right font-tabular-numeric text-tabular-numeric"><%= preview_money(line_item[:amount_cents], project.currency_iso) %></td>
+            <% RiskDriverSettings::DRIVER_TYPES.each do |driver_type| %>
+              <td class="px-3 py-2 align-top">
+                <%= render "risk_setting_cell",
+                      setting: line_item[:risk_settings_by_type][driver_type],
+                      driver_type: driver_type,
+                      overridden: line_item[:overridden][driver_type] %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>

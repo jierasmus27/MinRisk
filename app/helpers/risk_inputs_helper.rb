@@ -13,6 +13,12 @@ module RiskInputsHelper
     "design" => "text-amber-600"
   }.freeze
 
+  DRIVER_CELL_ACCENT_CLASSES = {
+    "price" => "border-l-blue-500",
+    "quantity" => "border-l-green-500",
+    "design" => "border-l-amber-500"
+  }.freeze
+
   def risk_driver_badge_class(driver_type)
     DRIVER_BADGE_CLASSES.fetch(driver_type, "bg-surface-container-high text-on-surface-variant border border-outline-variant")
   end
@@ -23,5 +29,45 @@ module RiskInputsHelper
 
   def risk_driver_viz_color_class(driver_type)
     DRIVER_VIZ_COLOR_CLASSES.fetch(driver_type, "text-primary")
+  end
+
+  def risk_setting_cell_accent_class(driver_type)
+    DRIVER_CELL_ACCENT_CLASSES.fetch(driver_type, "border-l-primary")
+  end
+
+  def spreadsheet_driver_badge_class(driver_dimension)
+    {
+      "package" => "bg-surface-container-high text-on-surface-variant border border-outline-variant",
+      "wbs" => "bg-purple-50 text-purple-700 border border-purple-100",
+      "discipline" => "bg-teal-50 text-teal-700 border border-teal-100"
+    }.fetch(driver_dimension, "bg-surface-container-high text-on-surface-variant border border-outline-variant")
+  end
+
+  def spreadsheet_driver_label(driver_dimension)
+    driver_dimension.to_s.humanize
+  end
+
+  def risk_settings_json(settings_by_type)
+    (settings_by_type || {}).transform_keys(&:to_s).to_json
+  end
+
+  def risk_source_accuracy_label(source_accuracy_class)
+    RiskDriverSettings::SOURCE_ACCURACY_CLASSES[source_accuracy_class] || "—"
+  end
+
+  def risk_source_accuracy_parts(source_accuracy_class)
+    label = risk_source_accuracy_label(source_accuracy_class)
+    return { title: nil, subtitle: nil } if label == "—"
+
+    title, subtitle = label.split(" - ", 2)
+    { title: title, subtitle: subtitle }
+  end
+
+  def risk_distribution_label(distribution_type)
+    distribution_type.present? ? distribution_type.humanize : "—"
+  end
+
+  def risk_percentile_value(pct)
+    number_to_percentage(pct, precision: 1, strip_insignificant_zeros: true)
   end
 end

@@ -2,9 +2,9 @@
 
 <%= render "shared/page_header",
       title: "Risk Input Configuration",
-      subtitle: "Select and apply accuracy driver settings to cost packages." %>
+      subtitle: "Select and apply accuracy driver settings to driver groups and line items." %>
 
-<div class="p-6 flex-1 flex flex-col gap-6 max-w-7xl mx-auto w-full" data-controller="risk-inputs">
+<div class="px-4 py-6 lg:px-8 flex-1 flex flex-col gap-6 max-w-[1600px] mx-auto w-full" data-controller="risk-inputs">
   <%= render "shared/project_selector",
         companies: @companies,
         company: @company,
@@ -28,7 +28,7 @@
 
   <section class="<%= card_class %>">
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 <%= card_title_bar_class %>">
-      <h2 class="<%= card_title_class %>">Cost Packages / Line Items</h2>
+      <h2 class="<%= card_title_class %>">Driver Groups / Line Items</h2>
       <%= render "filters",
             company: @company,
             project: @project,
@@ -37,16 +37,16 @@
             cost_type_options: @cost_type_options %>
     </div>
 
-    <%= render "package_tree",
-          package_rows: @package_rows,
+    <%= render "driver_group_tree",
+          driver_group_rows: @driver_group_rows,
           project: @project,
-          driver_records_by_package: @driver_records_by_package,
-          selected_package_ids: @selected_package_ids %>
+          selected_group_keys: @selected_group_keys,
+          selected_line_item_ids: @selected_line_item_ids %>
 
     <%= render "summary_footer",
           summary: @summary,
           project: @project,
-          packages_with_drivers_count: @packages_with_drivers_count,
-          total_package_count: @total_package_count %>
+          driver_groups_with_settings_count: @driver_groups_with_settings_count,
+          total_driver_group_count: @total_driver_group_count %>
   </section>
 </div>

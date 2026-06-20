@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["packageCheckbox", "driverForm", "packageIds", "applyButton", "packageLineRow", "distributionViz"]
+  static targets = ["groupCheckbox", "lineItemCheckbox", "driverForm", "groupKeys", "lineItemIds", "applyButton", "groupLineRow", "distributionViz"]
 
   connect() {
     this.driverFormTargets.forEach((form) => {
@@ -15,14 +15,14 @@ export default class extends Controller {
     event.target.form.requestSubmit()
   }
 
-  togglePackageRows(event) {
+  toggleGroupRows(event) {
     const button = event.currentTarget
-    const packageId = button.dataset.packageId
+    const groupKey = button.dataset.groupKey
     const expanded = button.getAttribute("aria-expanded") === "true"
     const nextExpanded = !expanded
 
-    this.packageLineRowTargets
-      .filter((row) => row.dataset.parentPackageId === packageId)
+    this.groupLineRowTargets
+      .filter((row) => row.dataset.parentGroupKey === groupKey)
       .forEach((row) => row.classList.toggle("hidden", !nextExpanded))
 
     button.setAttribute("aria-expanded", String(nextExpanded))
@@ -31,20 +31,29 @@ export default class extends Controller {
   }
 
   selectionChanged() {
-    const selectedIds = this.selectedPackageIds()
+    const selectedGroupKeys = this.selectedGroupKeys()
+    const selectedLineItemIds = this.selectedLineItemIds()
+    const selectionCount = selectedGroupKeys.length + selectedLineItemIds.length
 
     this.driverFormTargets.forEach((form) => {
-      const packageIdsContainer = form.querySelector('[data-risk-inputs-target="packageIds"]')
-      if (!packageIdsContainer) return
+      const groupKeysContainer = form.querySelector('[data-risk-inputs-target="groupKeys"]')
+      if (groupKeysContainer) {
+        groupKeysContainer.innerHTML = selectedGroupKeys.map((key) => (
+          `<input type="hidden" name="risk_input[driver_group_keys][]" value="${this.escapeHtml(key)}">`
+        )).join("")
+      }
 
-      packageIdsContainer.innerHTML = selectedIds.map((id) => (
-        `<input type="hidden" name="risk_input[package_value_ids][]" value="${id}">`
-      )).join("")
+      const lineItemIdsContainer = form.querySelector('[data-risk-inputs-target="lineItemIds"]')
+      if (lineItemIdsContainer) {
+        lineItemIdsContainer.innerHTML = selectedLineItemIds.map((id) => (
+          `<input type="hidden" name="risk_input[line_item_ids][]" value="${id}">`
+        )).join("")
+      }
     })
 
     this.applyButtonTargets.forEach((button) => {
-      button.disabled = selectedIds.length === 0
-      button.textContent = `Apply to ${selectedIds.length} selected package${selectedIds.length === 1 ? "" : "s"}`
+      button.disabled = selectionCount === 0
+      button.textContent = `Apply to ${selectionCount} selected`
     })
 
     this.populateFromSingleSelection()
@@ -72,7 +81,10 @@ export default class extends Controller {
   }
 
   populateFromSingleSelection() {
-    const selected = this.packageCheckboxTargets.filter((checkbox) => checkbox.checked)
+    const selected = [
+      ...this.groupCheckboxTargets.filter((checkbox) => checkbox.checked),
+      ...this.lineItemCheckboxTargets.filter((checkbox) => checkbox.checked)
+    ]
     if (selected.length !== 1) return
 
     const driverValues = JSON.parse(selected[0].dataset.driverValues || "{}")
@@ -90,8 +102,12 @@ export default class extends Controller {
     })
   }
 
-  selectedPackageIds() {
-    return this.packageCheckboxTargets.filter((checkbox) => checkbox.checked).map((checkbox) => checkbox.value)
+  selectedGroupKeys() {
+    return this.groupCheckboxTargets.filter((checkbox) => checkbox.checked).map((checkbox) => checkbox.value)
+  }
+
+  selectedLineItemIds() {
+    return this.lineItemCheckboxTargets.filter((checkbox) => checkbox.checked).map((checkbox) => checkbox.value)
   }
 
   setFormValue(form, role, value) {
@@ -102,5 +118,13 @@ export default class extends Controller {
   formatPercent(value) {
     if (value === null || value === undefined || value === "") return "0%"
     return `${value}%`
+  }
+
+  escapeHtml(value) {
+    return value
+      .replaceAll("&", "&amp;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
   }
 }
