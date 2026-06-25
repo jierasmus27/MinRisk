@@ -26,7 +26,7 @@ gem "roo", "~> 2.10"
 gem "caxlsx", "~> 4.2"
 gem "csv"
 gem "countries", "~> 7.0"
-gem "paper_trail", "~> 16.0"
+gem "paper_trail", "~> 17.0"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
