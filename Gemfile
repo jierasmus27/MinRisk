@@ -25,7 +25,7 @@ gem "money-rails", "~> 1.15"
 gem "roo", "~> 2.10"
 gem "caxlsx", "~> 4.2"
 gem "csv"
-gem "countries", "~> 7.0"
+gem "countries", "~> 8.1"
 gem "paper_trail", "~> 16.0"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
